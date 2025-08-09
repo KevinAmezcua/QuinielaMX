@@ -1,4 +1,4 @@
-const apiURL = 'http://localhost:3000';
+const apiURL = 'https://quinielamx.onrender.com';
 
 async function enviarQuiniela() {
     const nombre = document.getElementById('nombre').value.trim();

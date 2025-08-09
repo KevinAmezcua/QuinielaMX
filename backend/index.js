@@ -2,9 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-mongoose.connect('mongodb+srv://root:50KA36aNuH1sNyZV@quiniela.8suihry.mongodb.net/?retryWrites=true&w=majority&appName=Quiniela')
+if (!process.env.MONGO_URI) {
+    console.error("Error: La variable MONGO_URI no está definida.");
+    process.exit(1);
+}
+
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Conectado"))
 .catch(error => console.log(error.message));
 
@@ -83,5 +88,5 @@ app.post('/newQuiniela', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+    console.log(`Servidor escuchando en puerto ${PORT}`);
 });
