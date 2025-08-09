@@ -70,7 +70,7 @@ li {
 
 #imagen-aficion-container img {
     width: 100vw;        
-    max-height: 620px;  
+    max-height: 590px;  
     height: auto;
     object-fit: cover; 
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
@@ -142,8 +142,6 @@ h1 {
 }
 
 /* RESPONSIVE */
-
-/* RESPONSIVE PARA 900px */
 @media (max-width: 900px) {
     .contenedor-partidos {
         flex-direction: row;
@@ -215,6 +213,7 @@ h1 {
         max-width: 350px;
         margin: 0 auto;
         display: flex;
+        justify-content: center;
         align-items: center;
         gap: 1rem;
         padding: 10px;
