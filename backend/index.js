@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-mongoose.connect('')
+mongoose.connect('mongodb+srv://root:50KA36aNuH1sNyZV@quiniela.8suihry.mongodb.net/?retryWrites=true&w=majority&appName=Quiniela')
 .then(() => console.log("MongoDB Conectado"))
 .catch(error => console.log(error.message));
 
@@ -48,6 +48,7 @@ app.get('/getQuiniela', async (req, res) => {
 
 app.post('/newQuiniela', async (req, res) => {
     try {
+        console.log("Body recibido:", req.body);
         const {nombre, partidos} = req.body;
 
         // Validar datos básicos

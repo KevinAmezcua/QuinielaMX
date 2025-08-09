@@ -60,13 +60,6 @@ h1 {
     border-radius: 10px;
 }
 
-.local:hover,
-.empate:hover,
-.visita:hover {
-    cursor: pointer;
-    background-color: #e7e3e3;
-}
-
 input {
     margin: 10px auto 0;
     padding: 12px 40px;
