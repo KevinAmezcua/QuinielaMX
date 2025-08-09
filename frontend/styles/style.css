@@ -247,12 +247,13 @@ h1 {
 
     nav {
         width: 95%;
-        font-size: 22px;
-        margin: 1rem auto;
+        font-size: 20px;
+        padding: 0.5rem 1rem;
+        box-sizing: border-box;
     }
 
     ul {
-        gap: 3rem;
+        gap: 1.5rem;
         flex-wrap: wrap;
         justify-content: center;
     }
