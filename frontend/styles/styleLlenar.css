@@ -1,0 +1,109 @@
+.section-form {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 15px;
+    background-color: #f5f7fa; /* fondo gris muy claro */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    font-size: 40px;
+    color: #333;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.partido {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.partido div {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.partido img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.local, .visita {
+    max-width: 120px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #f8f4f4;
+}
+
+.empate {
+    max-width: 80px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #555;
+    border-radius: 10px;
+}
+
+.local:hover,
+.empate:hover,
+.visita:hover {
+    cursor: pointer;
+    background-color: #e7e3e3;
+}
+
+input {
+    margin: 10px auto 0;
+    padding: 12px 40px;
+    font-size: 1.2rem;
+    border: 1px solid rgb(230, 229, 229);
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    display: block;
+    font-weight: bold;
+    letter-spacing: 2px;    
+}
+
+button {
+    margin: 20px auto 0;
+    padding: 12px 40px;
+    font-size: 1.2rem;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+button:hover {
+    background-color: #005fa3;
+}
+
+.local, .empate, .visita {
+    cursor: pointer;
+    transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+.seleccionado {
+    background-color: #0077cc;
+    color: white;
+}

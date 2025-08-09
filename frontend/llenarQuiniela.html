@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llenar | Quiniela Liga MX</title>
+    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="./styles/styleLlenar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="./img/logo-ligamx.png">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul class="lista-header">
+                <li>
+                    <a href="#">
+                        <img src="./img/logo-ligamx.png" id="img-inicio">
+                    </a>
+                    <a href="./index.html">
+                        Inicio
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#" class="active">
+                        Llenar Quiniela
+                    </a>
+                </li>
+
+                <li>
+                    <a href="./resultados.html">
+                        Resultados
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="section-form">
+        <h1>Jornada 4</h1>
+        <div class="form">
+            <div class="partido">
+                <div><h2>Local</h2></div>
+                <div><h2>-</h2></div>
+                <div><h2>Visita</h2></div>
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/tigres.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/puebla.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/america.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/queretaro.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/mazatlan.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/xolos.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/atlas.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/pachuca.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/pumas.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/necaxa.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/santos.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/chivas.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/leon.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/mty.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/juarez.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/toluca.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div class="partido">
+                <div class="local"><img src="./img/san_luis.png" alt=""></div>
+                <div class="empate"><h3>Empate</h3></div>
+                <div class="visita"><img src="./img/cruz_azul.png" alt=""></div>
+                <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
+            </div>
+
+            <div>
+                <input type="text" placeholder="Nombre" required>
+            </div>
+
+            <div>
+                <button>Confirmar</button>
+            </div>
+        </div>
+    </section>
+
+    <script src="./scriptPartidos.js"></script>
+</body>
+</html>
