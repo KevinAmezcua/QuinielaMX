@@ -29,7 +29,7 @@ td {
 }
 
 tr:nth-child(even) {
-    background: #1d1c1c;
+    background: #282727;
 }
 
 .ganador {
@@ -72,7 +72,7 @@ tr:nth-child(even) {
 
     .tr-header th {
         font-size: 8px;
-        white-space: normal;      /* Permite salto de línea */
+        white-space: normal;  
         word-wrap: break-word;
     }
 
@@ -82,6 +82,8 @@ tr:nth-child(even) {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis; 
+        white-space: normal;  
+        word-wrap: break-word;
     }
 
     .header-partido img {
