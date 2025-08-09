@@ -52,34 +52,3 @@ async function enviarQuiniela() {
         console.error(error);
     }
 }
-
-async function obtenerQuinielas() {
-    try {
-        const res = await fetch(`${apiURL}/getQuiniela`);
-        const data = await res.json();
-
-        const quinielaBody = document.getElementById('quiniela');
-        quinielaBody.innerHTML = '';
-        
-        data.quinielas.forEach(q => {
-            const tr = document.createElement('tr');
-            
-            let tdNombre = document.createElement('td');
-            tdNombre.textContent = q.nombre;
-            tr.appendChild(tdNombre);
-
-            q.partidos.forEach(p => {
-                let td = document.createElement('td');
-                td.textContent = p.resultado; // "Local", "Visita" o "Empate"
-                tr.appendChild(td);
-            });
-
-            quinielaBody.appendChild(tr);
-        });
-    } catch(error) {
-        alert("Error al obtener las Quinielas.");
-        console.log(error)
-    }
-}
-
-obtenerQuinielas();
