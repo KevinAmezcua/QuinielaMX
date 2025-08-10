@@ -16,6 +16,13 @@ th {
     color: black;
 }
 
+.header-partido {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: center;
+}
+
 .header-partido img {
     width: 50px;
     height: 50px;
@@ -89,7 +96,7 @@ tr:nth-child(even) {
     .header-partido img {
         width: 20px;
         height: 20px;
-        display: block;         /* Evita que la imagen afecte la altura */
+        display: block; 
         margin: 0 auto;
     }
 

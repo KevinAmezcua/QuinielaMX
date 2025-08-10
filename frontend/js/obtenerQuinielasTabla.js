@@ -2,7 +2,7 @@ const apiURL = 'https://quinielamx.onrender.com';
 
 const resultadosOficiales = [
     "local",
-    "",
+    "local",
     "",
     "", 
     "", 
@@ -12,7 +12,7 @@ const resultadosOficiales = [
     "" 
 ];
 
-async function obtenerQuinielas() {
+async function obtenerQuinielasTabla() {
     try {
         const res = await fetch(`${apiURL}/getQuiniela`);
         const data = await res.json();
@@ -53,9 +53,8 @@ async function obtenerQuinielas() {
         });
 
     } catch (error) {
-        console.error("Error al obtener las Quinielas:", error);
         alert("Error al obtener las Quinielas.");
     }
 }
 
-obtenerQuinielas();
+obtenerQuinielasTabla();

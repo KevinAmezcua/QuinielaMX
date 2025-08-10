@@ -87,6 +87,22 @@ app.post('/newQuiniela', async (req, res) => {
     }
 });
 
+app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
+    try {
+        const quinielaId = req.params.shoeId;
+        
+        await Quiniela.findByIdAndDelete(quinielaId);
+        return res.status(200).json({
+            message: "Quiniela eliminada con éxito."
+        })
+    } catch(error) {
+        return res.status(500).json({
+            message: "Error al eliminar Quiniela.",
+            error: error
+        });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en puerto ${PORT}`);
 });
