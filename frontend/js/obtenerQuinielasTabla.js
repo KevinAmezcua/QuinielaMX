@@ -3,8 +3,8 @@ const apiURL = 'https://quinielamx.onrender.com';
 const resultadosOficiales = [
     "local",
     "local",
-    "",
-    "", 
+    "empate",
+    "visita", 
     "", 
     "",  
     "",
