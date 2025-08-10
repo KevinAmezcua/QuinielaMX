@@ -93,6 +93,11 @@ tr:nth-child(even) {
         word-wrap: break-word;
     }
 
+    .header-partido {
+        display: flex;
+        flex-direction: column;
+    }
+
     .header-partido img {
         width: 20px;
         height: 20px;
