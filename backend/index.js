@@ -47,8 +47,6 @@ app.get('/', (req, res) => {
 
 app.get('/getQuiniela', async (req, res) => {
     try {
-        res.set('Cache-Control', 'no-store');
-
         const quinielas = await Quiniela.find();
 
         return res.status(200).json({
@@ -102,25 +100,17 @@ app.post('/newQuiniela', async (req, res) => {
 app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
     try {
         const quinielaId = req.params.quinielaId;
-        console.log("DELETE request id:", quinielaId);
-
-        if (!mongoose.Types.ObjectId.isValid(quinielaId)) {
-            return res.status(400).json({ message: "ID inválido" });
-        }
-
         const deleted = await Quiniela.findByIdAndDelete(quinielaId);
-
+            
         if (!deleted) {
-            console.log("No se encontró el documento en la DB.");
             return res.status(404).json({ message: "Quiniela no encontrada." });
         }
-
-        console.log("Documento eliminado:", deleted._id.toString());
-        return res.status(200).json({ message: "Quiniela eliminada con éxito.", deleted });
-    } catch (error) {
-        return res.status(500).json({ message: "Error al eliminar Quiniela.", error: error.message });
-    }
-});
+            
+        return res.status(200).json({ message: "Quiniela eliminada con éxito." });
+        } catch (error) {
+            return res.status(500).json({ message: "Error al eliminar Quiniela.", error });
+        }
+    });
 
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en puerto ${PORT}`);
