@@ -33,13 +33,8 @@ async function obtenerQuinielaTarjeta() {
 
 async function eliminarQuiniela(id) {
     try {
-        console.log("Intentando eliminar quiniela con ID:", id);
         const res = await fetch(`${apiURL}/deleteQuiniela/${id}`, {
-            method: 'DELETE',
-            cache: 'no-store', // evita cache en el fetch
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'DELETE'
         });
 
         const data = await res.json();

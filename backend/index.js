@@ -12,11 +12,7 @@ if (!process.env.MONGO_URI) {
 }
 
 mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-    console.log("MongoDB Conectado");
-    console.log("Usando URI:", process.env.MONGO_URI);
-    console.log("Base de datos:", mongoose.connection.name);
-})
+.then(() => console.log("MongoDB Conectado"))
 .catch(error => console.log(error.message));
 
 app.use(express.json());
