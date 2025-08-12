@@ -1,12 +1,12 @@
 const apiURL = 'https://quinielamx.onrender.com';
 
 const resultadosOficiales = [
-    "local", // Partido 1
-    "local", // Partido 2
-    "empate", // Partido 3
-    "visita", // Partido 4
-    "empate", // Partido 5
-    "local", // Partido 6
+    "", // Partido 1
+    "", // Partido 2
+    "", // Partido 3
+    "", // Partido 4
+    "", // Partido 5
+    "", // Partido 6
     "", // Partido 7
     "", // Partido 8
     "" // Partido 9
