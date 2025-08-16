@@ -1,7 +1,7 @@
 const apiURL = 'https://quinielamx.onrender.com';
 
 const resultadosOficiales = [
-    "", // Partido 1
+    "visita", // Partido 1
     "", // Partido 2
     "", // Partido 3
     "", // Partido 4
