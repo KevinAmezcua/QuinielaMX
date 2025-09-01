@@ -8,7 +8,7 @@ const resultadosOficiales = [
     "visita", // Partido 5
     "visita", // Partido 6
     "local", // Partido 7
-    "", // Partido 8
+    "local", // Partido 8
     "" // Partido 9
 ];
 
