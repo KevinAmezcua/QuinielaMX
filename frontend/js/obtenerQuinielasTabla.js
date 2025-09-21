@@ -6,8 +6,8 @@ const resultadosOficiales = [
     "empate", // Partido 3
     "local", // Partido 4
     "visita", // Partido 5
-    "", // Partido 6
-    "", // Partido 7
+    "empate", // Partido 6
+    "visita", // Partido 7
     "", // Partido 8
     "" // Partido 9
 ];
