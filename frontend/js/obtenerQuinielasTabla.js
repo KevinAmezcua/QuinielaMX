@@ -9,7 +9,7 @@ const resultadosOficiales = [
     "local", // Partido 6
     "local", // Partido 7
     "visita", // Partido 8
-    "" // Partido 9
+    "local" // Partido 9
 ];
 
 async function obtenerQuinielasTabla() {
