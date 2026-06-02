@@ -42,7 +42,6 @@ async function enviarQuiniela() {
         const data = await res.json();
 
         if (res.ok) {
-            alert(data.message || "¡Quiniela enviada con éxito!");
             window.location.href = './resultados.html';
         } else {
             alert(data.message || "Error al enviar la quiniela.");
