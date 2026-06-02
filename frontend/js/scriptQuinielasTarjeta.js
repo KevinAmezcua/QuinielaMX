@@ -20,7 +20,7 @@ async function obtenerQuinielaTarjeta() {
             div.innerHTML = `
                 <h3>${quiniela.nombre}</h3>
                 <h4>${respuestas}</h4>
-                <button type="button" class="delete" onclick="eliminarQuiniela('${quiniela._id}')">Eliminar</button>
+                <button type="button" class="delete" onclick="eliminarQuiniela('${quiniela._id}', '${quiniela.nombre.replace(/'/g, "\\'")}')">Eliminar</button>
             `;
 
             quinielaDiv.appendChild(div);
@@ -31,22 +31,17 @@ async function obtenerQuinielaTarjeta() {
     }
 }
 
-async function eliminarQuiniela(id) {
+async function eliminarQuiniela(id, nombre) {
+    if (!confirm(`¿Deseas eliminar la quiniela de "${nombre}"?`)) return;
+
     try {
         const res = await fetch(`${apiURL}/deleteQuiniela/${id}`, {
             method: 'DELETE'
         });
 
         const data = await res.json();
-        console.log("Respuesta del servidor:", data);
-        
+
         if (res.ok) {
-            // si el backend devuelve deleted, lo mostramos
-            if (data.deleted && data.deleted._id) {
-                console.log("Se eliminó en DB el _id:", data.deleted._id);
-            }
-            alert(data.message);
-            // reload seguro de la lista
             await obtenerQuinielaTarjeta();
         } else {
             alert(data.message || "Error al eliminar.");
