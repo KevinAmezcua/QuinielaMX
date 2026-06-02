@@ -23,10 +23,19 @@ async function renderPartidosInicio() {
 
         contenedor.innerHTML = partidos.map(p => `
             <div class="tarjeta-partido">
-                <img src="./img/${p.localImg}" alt="${p.local}">
-                <img src="./img/${p.visitaImg}" alt="${p.visita}">
-                <p><i class="fa-regular fa-calendar"></i> ${formatFecha(p.fecha)}</p>
-                <p><i class="fa-regular fa-clock"></i> ${p.hora}</p>
+                <div class="equipo-card">
+                    <img src="./img/${p.localImg}" alt="${p.local}">
+                    <span class="equipo-nombre">${p.local}</span>
+                </div>
+                <div class="card-centro">
+                    <span class="vs">VS</span>
+                    <p class="card-fecha"><i class="fa-regular fa-calendar"></i> ${formatFecha(p.fecha)}</p>
+                    <p class="card-hora"><i class="fa-regular fa-clock"></i> ${p.hora}</p>
+                </div>
+                <div class="equipo-card">
+                    <img src="./img/${p.visitaImg}" alt="${p.visita}">
+                    <span class="equipo-nombre">${p.visita}</span>
+                </div>
             </div>
         `).join('');
 

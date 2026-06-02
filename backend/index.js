@@ -53,6 +53,14 @@ const Quiniela = mongoose.model('Quiniela', QuinielaSchema);
 
 // ─── Jornada endpoints ───────────────────────────────────────────────────────
 
+app.post('/verifyAdmin', (req, res) => {
+    const { password } = req.body;
+    if (password === ADMIN_PASSWORD) {
+        return res.status(200).json({ ok: true });
+    }
+    return res.status(401).json({ ok: false, message: "Contraseña incorrecta." });
+});
+
 app.get('/', (req, res) => {
     res.json({ message: "Bienvenido" });
 });

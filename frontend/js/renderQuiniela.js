@@ -1,5 +1,3 @@
-const apiURL = 'https://quinielamx.onrender.com';
-
 function formatFecha(fecha) {
     if (!fecha || !fecha.includes('-')) return fecha;
     const [y, m, d] = fecha.split('-');
@@ -24,9 +22,15 @@ async function renderFormPartidos() {
 
         contenedor.innerHTML = partidos.map(p => `
             <div class="partido">
-                <div class="local"><img src="./img/${p.localImg}" alt="${p.local}"></div>
-                <div class="empate"><h3>Empate</h3></div>
-                <div class="visita"><img src="./img/${p.visitaImg}" alt="${p.visita}"></div>
+                <div class="local">
+                    <img src="./img/${p.localImg}" alt="${p.local}">
+                    <span class="equipo-form-nombre">${p.local}</span>
+                </div>
+                <div class="empate">E<br><span style="font-size:0.65rem;letter-spacing:0">empate</span></div>
+                <div class="visita">
+                    <img src="./img/${p.visitaImg}" alt="${p.visita}">
+                    <span class="equipo-form-nombre">${p.visita}</span>
+                </div>
                 <input type="hidden" name="resultado[]" class="resultado-oculto" value="">
             </div>
         `).join('');

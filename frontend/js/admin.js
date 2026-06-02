@@ -203,6 +203,48 @@ async function cargarJornadaActual() {
     }
 }
 
-// Inicializar con 9 filas vacías y cargar jornada actual
-for (let i = 0; i < 9; i++) agregarPartido();
-cargarJornadaActual();
+async function verificarAdmin() {
+    const password = document.getElementById('admin-password').value;
+    const errorEl  = document.getElementById('password-error');
+    const btn      = document.querySelector('.password-row .btn-primary');
+
+    if (!password) {
+        errorEl.style.display = 'block';
+        errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Ingresa la contraseña.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+    try {
+        const res = await fetch(`${apiURL}/verifyAdmin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+
+        if (res.ok) {
+            errorEl.style.display = 'none';
+            document.getElementById('card-jornada').style.display   = 'block';
+            document.getElementById('card-resultados').style.display = 'block';
+            document.getElementById('admin-password').disabled = true;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Verificado';
+            btn.style.background = 'var(--green)';
+            for (let i = 0; i < 9; i++) agregarPartido();
+            cargarJornadaActual();
+        } else {
+            errorEl.style.display = 'block';
+            errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Contraseña incorrecta.';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Continuar';
+            document.getElementById('admin-password').focus();
+        }
+    } catch {
+        errorEl.style.display = 'block';
+        errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Error al conectar con el servidor.';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Continuar';
+    }
+}
