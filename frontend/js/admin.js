@@ -1,5 +1,9 @@
 const apiURL = 'https://quinielamx.onrender.com';
 
+function toggleAdminCard(h2) {
+    h2.closest('.admin-card').classList.toggle('collapsed');
+}
+
 const EQUIPOS = [
     { nombre: 'América',           img: 'america.png' },
     { nombre: 'Atlas',             img: 'atlas.png' },

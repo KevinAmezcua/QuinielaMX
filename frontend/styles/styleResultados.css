@@ -240,7 +240,7 @@ tbody tr:nth-child(even):hover td.col-sticky-right {
     /* Tarjetas visibles por defecto */
     .cards-container { display: flex; }
 
-    .header-partido     { flex-direction: column; gap: 2px; }
+    .header-partido     { flex-direction: column; gap: 6px; }
     .header-partido img { width: 26px; height: 26px; }
     .tr-header th       { font-size: 0.78rem; padding: 8px 5px; }
     td                  { font-size: 0.8rem;  padding: 7px 5px; }
