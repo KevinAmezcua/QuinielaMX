@@ -30,6 +30,8 @@ async function enviarQuiniela() {
         return;
     }
 
+    if (!confirm(`¿Deseas enviar tu quiniela como "${nombre}"?`)) return;
+
     try {
         const res = await fetch(`${apiURL}/newQuiniela`, {
             method: 'POST',
@@ -38,12 +40,13 @@ async function enviarQuiniela() {
         });
 
         const data = await res.json();
-        alert(data.message);
 
-        document.getElementById('nombre').value = '';
-        contenedor.querySelectorAll('.resultado-oculto').forEach(input => input.value = '');
-        contenedor.querySelectorAll('.seleccionado').forEach(div => div.classList.remove('seleccionado'));
-        updateProgreso();
+        if (res.ok) {
+            alert(data.message || "¡Quiniela enviada con éxito!");
+            window.location.href = './resultados.html';
+        } else {
+            alert(data.message || "Error al enviar la quiniela.");
+        }
 
     } catch (error) {
         alert("Error al enviar la quiniela.");

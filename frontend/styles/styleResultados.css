@@ -114,6 +114,7 @@ tbody td.col-sticky-left {
     font-size: 0.95rem;
     min-width: 100px;
     background: var(--bg-card);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 tbody td.col-sticky-right {
@@ -189,10 +190,11 @@ tbody tr:nth-child(even):hover td.col-sticky-right {
 .card-nombre {
     flex: 1;
     font-size: 1.05rem;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .card-score {

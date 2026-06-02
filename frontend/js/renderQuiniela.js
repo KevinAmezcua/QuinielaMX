@@ -30,7 +30,7 @@ async function renderFormPartidos() {
                     <img src="./img/${p.localImg}" alt="${p.local}">
                     <span class="equipo-form-nombre">${p.local}</span>
                 </div>
-                <div class="empate">E<br><span style="font-size:0.6rem;letter-spacing:0">empate</span></div>
+                <div class="empate">empate</div>
                 <div class="visita">
                     <img src="./img/${p.visitaImg}" alt="${p.visita}">
                     <span class="equipo-form-nombre">${p.visita}</span>

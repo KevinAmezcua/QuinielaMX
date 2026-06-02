@@ -29,9 +29,19 @@ header {
     top: 0;
     z-index: 200;
     background: rgba(8, 11, 20, 0.93);
+    border-bottom: 1px solid var(--border);
+}
+
+/* El blur en ::before evita que backdrop-filter en el header cree un
+   containing block para position:fixed (bug en Chrome/Android). */
+header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    border-bottom: 1px solid var(--border);
+    z-index: -1;
+    pointer-events: none;
 }
 
 nav {
@@ -120,7 +130,7 @@ nav {
         padding: 0.5rem 0 2rem;
         display: none;
         overflow-y: auto;
-        z-index: 199;
+        z-index: 1000;
     }
     .nav-links.nav-open { display: flex; animation: slideDown 0.22s ease; }
 

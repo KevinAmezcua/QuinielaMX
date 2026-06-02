@@ -228,6 +228,7 @@ async function verificarAdmin() {
             errorEl.style.display = 'none';
             document.getElementById('card-jornada').style.display   = 'block';
             document.getElementById('card-resultados').style.display = 'block';
+            document.getElementById('card-eliminar').style.display   = 'block';
             document.getElementById('admin-password').disabled = true;
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-check"></i> Verificado';
