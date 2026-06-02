@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Quiniela Liga MX</title>
+    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="./styles/styleAdmin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="./img/logo-ligamx.png">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul class="lista-header">
+                <li>
+                    <a href="./index.html">
+                        <img src="./img/logo-ligamx.png" id="img-inicio">
+                    </a>
+                    <a href="./index.html">Inicio</a>
+                </li>
+                <li><a href="./llenarQuiniela.html">Quiniela</a></li>
+                <li><a href="./resultados.html">Resultados</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="admin-container">
+        <h1>Panel de Administración</h1>
+
+        <!-- Contraseña -->
+        <div class="admin-card">
+            <h2><i class="fa-solid fa-lock"></i> Contraseña</h2>
+            <div class="password-row">
+                <label for="admin-password">Contraseña de administrador:</label>
+                <input type="password" id="admin-password" placeholder="Ingresa la contraseña">
+            </div>
+        </div>
+
+        <!-- Configurar Jornada -->
+        <div class="admin-card">
+            <h2><i class="fa-solid fa-calendar-days"></i> Configurar Partidos de la Jornada</h2>
+
+            <div class="jornada-numero-row">
+                <label for="jornada-numero">Número de Jornada:</label>
+                <input type="number" id="jornada-numero" min="1" max="17" placeholder="Ej: 5">
+            </div>
+
+            <div id="partidos-admin"></div>
+
+            <div class="admin-buttons">
+                <button class="btn-add" onclick="agregarPartido()">
+                    <i class="fa-solid fa-plus"></i> Agregar partido
+                </button>
+                <button class="btn-primary" onclick="guardarJornada()">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Jornada
+                </button>
+            </div>
+        </div>
+
+        <!-- Actualizar Resultados -->
+        <div class="admin-card">
+            <h2><i class="fa-solid fa-check-double"></i> Actualizar Resultados Oficiales</h2>
+            <p id="jornada-actual-info">Cargando jornada actual...</p>
+            <div id="resultados-admin"></div>
+            <div class="admin-buttons" style="margin-top:1rem">
+                <button class="btn-primary" onclick="guardarResultados()">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Resultados
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script src="./js/admin.js"></script>
+</body>
+</html>

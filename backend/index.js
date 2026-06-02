@@ -11,6 +11,8 @@ if (!process.env.MONGO_URI) {
     process.exit(1);
 }
 
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Conectado"))
 .catch(error => console.log(error.message));
@@ -22,74 +24,153 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-const QuinielaSchema = new mongoose.Schema({
-    partidos: [
-        {
-            local: { type: String, required: true },   // equipo local
-            visita: { type: String, required: true },  // equipo visitante
-            resultado: { type: String, enum: ['local', 'empate', 'visita'], required: true }
-        }
-    ],
-    nombre: {type: String}
-    });
+// ─── Schemas ────────────────────────────────────────────────────────────────
 
+const JornadaSchema = new mongoose.Schema({
+    numero: { type: Number, required: true, unique: true },
+    partidos: [{
+        local:     { type: String, required: true },
+        localImg:  { type: String, required: true },
+        visita:    { type: String, required: true },
+        visitaImg: { type: String, required: true },
+        fecha:     { type: String, required: true },
+        hora:      { type: String, required: true },
+        resultado: { type: String, enum: ['local', 'empate', 'visita', ''], default: '' }
+    }]
+});
+const Jornada = mongoose.model('Jornada', JornadaSchema);
+
+const QuinielaSchema = new mongoose.Schema({
+    partidos: [{
+        local:     { type: String, required: true },
+        visita:    { type: String, required: true },
+        resultado: { type: String, enum: ['local', 'empate', 'visita'], required: true }
+    }],
+    nombre:  { type: String },
+    jornada: { type: Number }
+});
 const Quiniela = mongoose.model('Quiniela', QuinielaSchema);
 
+// ─── Jornada endpoints ───────────────────────────────────────────────────────
+
 app.get('/', (req, res) => {
-    res.json({
-        message: "Bienvenido"
-    });
+    res.json({ message: "Bienvenido" });
 });
+
+app.get('/getJornada', async (req, res) => {
+    try {
+        const jornada = await Jornada.findOne().sort({ numero: -1 });
+        if (!jornada) {
+            return res.status(404).json({ message: "No hay jornada configurada." });
+        }
+        return res.status(200).json({ jornada });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al obtener jornada.", error });
+    }
+});
+
+app.put('/setJornada', async (req, res) => {
+    try {
+        const { password, numero, partidos } = req.body;
+
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+        if (!numero || !Array.isArray(partidos) || partidos.length === 0) {
+            return res.status(400).json({ message: "Datos inválidos. Se requiere numero y partidos." });
+        }
+
+        const jornadaData = {
+            numero,
+            partidos: partidos.map(p => ({ ...p, resultado: p.resultado || '' }))
+        };
+
+        const jornada = await Jornada.findOneAndUpdate(
+            { numero },
+            jornadaData,
+            { upsert: true, new: true }
+        );
+
+        return res.status(200).json({ message: "Jornada guardada con éxito.", jornada });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al guardar jornada.", error });
+    }
+});
+
+app.put('/setResultados', async (req, res) => {
+    try {
+        const { password, numero, resultados } = req.body;
+
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+
+        const jornada = await Jornada.findOne({ numero });
+        if (!jornada) {
+            return res.status(404).json({ message: "Jornada no encontrada." });
+        }
+        if (!Array.isArray(resultados) || resultados.length !== jornada.partidos.length) {
+            return res.status(400).json({ message: `Se esperan ${jornada.partidos.length} resultados.` });
+        }
+
+        resultados.forEach((r, i) => {
+            jornada.partidos[i].resultado = r;
+        });
+        await jornada.save();
+
+        return res.status(200).json({ message: "Resultados actualizados con éxito." });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al actualizar resultados.", error });
+    }
+});
+
+// ─── Quiniela endpoints ──────────────────────────────────────────────────────
 
 app.get('/getQuiniela', async (req, res) => {
     try {
-        const quinielas = await Quiniela.find();
-
+        const { jornada } = req.query;
+        const filter = jornada ? { jornada: parseInt(jornada) } : {};
+        const quinielas = await Quiniela.find(filter);
         return res.status(200).json({
             message: "Resultados obtenidos con éxito.",
-            quinielas: quinielas
+            quinielas
         });
-    } catch(error) {
-        return res.status(500).json({
-            message: "Error al consultar Resultados.",
-            error: error
-        });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al consultar Resultados.", error });
     }
 });
 
 app.post('/newQuiniela', async (req, res) => {
     try {
-        console.log("Body recibido:", req.body);
-        const {nombre, partidos} = req.body;
+        const { nombre, partidos, jornada } = req.body;
 
-        // Validar datos básicos
-        if (!nombre || !Array.isArray(partidos) || partidos.length !== 9) {
+        const jornadaActual = await Jornada.findOne().sort({ numero: -1 });
+        const expectedCount = jornadaActual ? jornadaActual.partidos.length : 9;
+
+        if (!nombre || !Array.isArray(partidos) || partidos.length !== expectedCount) {
             return res.status(400).json({
-                message: "Datos inválidos. Debes enviar nombre y exactamente 9 partidos."
+                message: `Datos inválidos. Debes enviar nombre y exactamente ${expectedCount} partidos.`
             });
         }
 
-        // Validar estructura de cada partido
         for (const partido of partidos) {
             if (!partido.local || !partido.visita || !['local', 'empate', 'visita'].includes(partido.resultado)) {
                 return res.status(400).json({
-                    message: "Cada partido debe tener local, visita y un resultado válido (local, empate, visita)."
+                    message: "Cada partido debe tener local, visita y resultado válido (local, empate, visita)."
                 });
             }
         }
 
-        const newQuiniela = new Quiniela({nombre, partidos});
+        const newQuiniela = new Quiniela({
+            nombre,
+            partidos,
+            jornada: jornada || (jornadaActual ? jornadaActual.numero : null)
+        });
 
         await newQuiniela.save();
-        
-        return res.status(200).json({
-            message: "Quiniela creada con éxito."
-        });
-    } catch(error) {
-        return res.status(500).json({
-            message: "Error al crear Quiniela.",
-            error: error
-        });
+        return res.status(200).json({ message: "Quiniela creada con éxito." });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al crear Quiniela.", error });
     }
 });
 
@@ -97,16 +178,15 @@ app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
     try {
         const quinielaId = req.params.quinielaId;
         const deleted = await Quiniela.findByIdAndDelete(quinielaId);
-            
+
         if (!deleted) {
             return res.status(404).json({ message: "Quiniela no encontrada." });
         }
-            
         return res.status(200).json({ message: "Quiniela eliminada con éxito." });
-        } catch (error) {
-            return res.status(500).json({ message: "Error al eliminar Quiniela.", error });
-        }
-    });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al eliminar Quiniela.", error });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en puerto ${PORT}`);

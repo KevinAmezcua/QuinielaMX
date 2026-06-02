@@ -1,0 +1,235 @@
+.admin-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.admin-container h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    color: var(--color-accent, #e8b400);
+    margin-bottom: 0.5rem;
+}
+
+.admin-card {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.admin-card h2 {
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #444;
+    padding-bottom: 0.5rem;
+}
+
+/* Password row */
+.password-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.password-row label {
+    color: #ccc;
+    white-space: nowrap;
+}
+
+.password-row input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #111;
+    color: #fff;
+    font-size: 1rem;
+}
+
+/* Jornada numero */
+.jornada-numero-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.jornada-numero-row label {
+    color: #ccc;
+}
+
+.jornada-numero-row input {
+    width: 80px;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #111;
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* Partido admin row */
+.partido-admin {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #2a2a3e;
+}
+
+.partido-num {
+    color: #888;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.partido-admin-equipo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.partido-admin-equipo label {
+    color: #aaa;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.partido-admin-equipo select {
+    width: 100%;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #111;
+    color: #fff;
+    font-size: 0.85rem;
+}
+
+.partido-admin-centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.partido-admin-centro input {
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #111;
+    color: #fff;
+    font-size: 0.85rem;
+    width: 130px;
+}
+
+.team-preview {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.team-mini {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+/* Buttons */
+.admin-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-add,
+.btn-primary,
+.btn-remove {
+    padding: 0.5rem 1.1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-add {
+    background: #2a4a2a;
+    color: #7cfc00;
+    border: 1px solid #3a6a3a;
+}
+
+.btn-add:hover { background: #3a5a3a; }
+
+.btn-primary {
+    background: #e8b400;
+    color: #111;
+    font-weight: bold;
+}
+
+.btn-primary:hover { background: #f5c800; }
+
+.btn-remove {
+    background: #4a1a1a;
+    color: #ff6666;
+    border: 1px solid #6a2a2a;
+    padding: 0.4rem 0.6rem;
+}
+
+.btn-remove:hover { background: #5a2a2a; }
+
+/* Resultados section */
+#jornada-actual-info {
+    color: #aaa;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.resultado-admin-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #2a2a3e;
+}
+
+.partido-vs {
+    flex: 1;
+    color: #ddd;
+    font-size: 0.9rem;
+}
+
+.resultado-select {
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #111;
+    color: #fff;
+    font-size: 0.85rem;
+    min-width: 180px;
+}
+
+.aviso {
+    color: #888;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+@media (max-width: 600px) {
+    .partido-admin {
+        grid-template-columns: 1fr;
+    }
+    .resultado-admin-row {
+        flex-wrap: wrap;
+    }
+}

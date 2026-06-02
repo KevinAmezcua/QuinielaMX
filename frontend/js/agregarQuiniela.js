@@ -2,13 +2,12 @@ const apiURL = 'https://quinielamx.onrender.com';
 
 async function enviarQuiniela() {
     const nombre = document.getElementById('nombre').value.trim();
-    const partidosDOM = document.querySelectorAll('.partido');
+    const contenedor = document.getElementById('partidos-form');
+    const jornadaNum = parseInt(contenedor?.dataset.jornada) || null;
+    const partidosDOM = contenedor.querySelectorAll('.partido');
     const partidos = [];
 
-    // Omitimos el primer div que es solo encabezado
-    partidosDOM.forEach((partido, index) => {
-        if (index === 0) return; 
-
+    partidosDOM.forEach(partido => {
         const localImg = partido.querySelector('.local img');
         const visitaImg = partido.querySelector('.visita img');
         const resultado = partido.querySelector('.resultado-oculto')?.value;
@@ -22,12 +21,11 @@ async function enviarQuiniela() {
         }
     });
 
-    // Validaciones
     if (!nombre) {
         alert("Por favor ingresa tu nombre.");
         return;
     }
-    if (partidos.length !== 9) {
+    if (partidos.length !== partidosDOM.length) {
         alert("Debes seleccionar un resultado para todos los partidos.");
         return;
     }
@@ -36,16 +34,15 @@ async function enviarQuiniela() {
         const res = await fetch(`${apiURL}/newQuiniela`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, partidos })
+            body: JSON.stringify({ nombre, partidos, jornada: jornadaNum })
         });
 
         const data = await res.json();
         alert(data.message);
 
-        // Limpiar formulario
         document.getElementById('nombre').value = '';
-        document.querySelectorAll('.resultado-oculto').forEach(input => input.value = '');
-        document.querySelectorAll('.seleccionado').forEach(div => div.classList.remove('seleccionado'));
+        contenedor.querySelectorAll('.resultado-oculto').forEach(input => input.value = '');
+        contenedor.querySelectorAll('.seleccionado').forEach(div => div.classList.remove('seleccionado'));
 
     } catch (error) {
         alert("Error al enviar la quiniela.");

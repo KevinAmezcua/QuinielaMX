@@ -1,42 +1,62 @@
 const apiURL = 'https://quinielamx.onrender.com';
 
-const resultadosOficiales = [
-    "", // Partido 1
-    "", // Partido 2
-    "", // Partido 3
-    "", // Partido 4
-    "", // Partido 5
-    "", // Partido 6
-    "", // Partido 7
-    "", // Partido 8
-    "" // Partido 9
-];
-
 async function obtenerQuinielasTabla() {
     try {
-        const res = await fetch(`${apiURL}/getQuiniela`);
-        const data = await res.json();
+        // 1. Obtener jornada actual (partidos + resultados oficiales)
+        const jornadaRes = await fetch(`${apiURL}/getJornada`);
+        const jornadaData = await jornadaRes.json();
+        const jornada = jornadaData.jornada;
+
+        if (!jornada) {
+            document.getElementById('quiniela').innerHTML =
+                '<tr><td colspan="100%">No hay jornada configurada.</td></tr>';
+            return;
+        }
+
+        document.querySelector('h1').textContent = `Jornada ${jornada.numero}`;
+
+        // 2. Construir encabezados de la tabla dinámicamente
+        const trHeader = document.querySelector('.tr-header');
+        trHeader.innerHTML = '<th>Participantes</th>';
+
+        jornada.partidos.forEach(p => {
+            const th = document.createElement('th');
+            th.innerHTML = `
+                <div class="header-partido">
+                    <img src="./img/${p.localImg}" alt="${p.local}">
+                    <img src="./img/${p.visitaImg}" alt="${p.visita}">
+                </div>`;
+            trHeader.appendChild(th);
+        });
+
+        const thAciertos = document.createElement('th');
+        thAciertos.textContent = 'Aciertos';
+        trHeader.appendChild(thAciertos);
+
+        // 3. Obtener quinielas de esta jornada
+        const quinRes = await fetch(`${apiURL}/getQuiniela?jornada=${jornada.numero}`);
+        const quinData = await quinRes.json();
 
         const quinielaBody = document.getElementById('quiniela');
         quinielaBody.innerHTML = '';
 
-        data.quinielas.forEach(q => {
+        // 4. Comparar cada quiniela contra los resultados oficiales
+        const resultadosOficiales = jornada.partidos.map(p => p.resultado);
+
+        quinData.quinielas.forEach(q => {
             const tr = document.createElement('tr');
 
-            // Nombre del jugador
-            let tdNombre = document.createElement('td');
+            const tdNombre = document.createElement('td');
             tdNombre.textContent = q.nombre;
             tr.appendChild(tdNombre);
 
             let aciertos = 0;
 
-            // Partidos
             q.partidos.forEach((p, index) => {
-                let td = document.createElement('td');
-                td.textContent = p.resultado; // mostrará "local", "empate" o "visita"
+                const td = document.createElement('td');
+                td.textContent = p.resultado;
 
-                // Si acierta
-                if (p.resultado === resultadosOficiales[index]) {
+                if (resultadosOficiales[index] && p.resultado === resultadosOficiales[index]) {
                     td.classList.add('ganador');
                     aciertos++;
                 }
@@ -44,8 +64,7 @@ async function obtenerQuinielasTabla() {
                 tr.appendChild(td);
             });
 
-            // Aciertos
-            let tdAciertos = document.createElement('td');
+            const tdAciertos = document.createElement('td');
             tdAciertos.textContent = aciertos;
             tr.appendChild(tdAciertos);
 
@@ -54,6 +73,7 @@ async function obtenerQuinielasTabla() {
 
     } catch (error) {
         alert("Error al obtener las Quinielas.");
+        console.error(error);
     }
 }
 
