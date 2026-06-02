@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,43 +13,46 @@
 <body>
     <header>
         <nav>
-            <ul class="lista-header">
-                <li>
-                    <a href="./index.html">
-                        <img src="./img/logo-ligamx.png" id="img-inicio">
-                    </a>
-                    <a href="./index.html">
-                        Inicio
-                    </a>
-                </li>
-
-                <li>
-                    <a href="./llenarQuiniela.html">
-                        Quiniela
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#" class="active">
-                        Resultados
-                    </a>
-                </li>
+            <a href="./index.html" class="nav-brand">
+                <img src="./img/logo-ligamx.png" alt="Liga MX">
+                <span>Quiniela MX</span>
+            </a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="./index.html">Inicio</a></li>
+                <li><a href="./llenarQuiniela.html">Quiniela</a></li>
+                <li><a href="./resultados.html" class="active">Resultados</a></li>
             </ul>
+            <button class="nav-toggle" id="nav-toggle" onclick="toggleNav()" aria-label="Menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </nav>
     </header>
 
     <section class="contenedor-tabla">
         <h1>Jornada</h1>
-        <div class="tabla-wrapper">
+
+        <div class="vista-toggle" id="vista-toggle">
+            <button class="toggle-btn activo" id="btn-cards" onclick="setVista('cards')">
+                <i class="fa-solid fa-id-card"></i> Tarjetas
+            </button>
+            <button class="toggle-btn" id="btn-tabla" onclick="setVista('tabla')">
+                <i class="fa-solid fa-table"></i> Tabla
+            </button>
+        </div>
+
+        <div id="tabla-container" class="tabla-wrapper">
             <table class="results-table">
                 <tr class="tr-header">
-                    <th>Participantes</th>
+                    <th class="col-sticky-left">Participantes</th>
                 </tr>
                 <tbody id="quiniela"></tbody>
             </table>
         </div>
+
+        <div id="cards-container" class="cards-container"></div>
     </section>
 
+    <script src="./js/nav.js"></script>
     <script src="./js/obtenerQuinielasTabla.js"></script>
 </body>
 </html>

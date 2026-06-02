@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,49 +12,48 @@
 <body>
     <header>
         <nav>
-            <ul class="lista-header">
-                <li>
-                    <a href="#">
-                        <img src="./img/logo-ligamx.png" id="img-inicio">
-                    </a>
-                    <a href="#" class="active">
-                        Inicio
-                    </a>
-                </li>
-
-                <li>
-                    <a href="./llenarQuiniela.html">
-                        Quiniela
-                    </a>
-                </li>
-
-                <li>
-                    <a href="./resultados.html">
-                        Resultados
-                    </a>
-                </li>
+            <a href="./index.html" class="nav-brand">
+                <img src="./img/logo-ligamx.png" alt="Liga MX">
+                <span>Quiniela MX</span>
+            </a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="./index.html" class="active">Inicio</a></li>
+                <li><a href="./llenarQuiniela.html">Quiniela</a></li>
+                <li><a href="./resultados.html">Resultados</a></li>
             </ul>
+            <button class="nav-toggle" id="nav-toggle" onclick="toggleNav()" aria-label="Menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </nav>
     </header>
 
     <div id="imagen-aficion-container">
-        <img src="https://sportsmedia.games/wp-content/uploads/2025/04/LIGA-MX-CLAUSURA-2025-FASE-FINAL-scaled.jpg" alt="Afición del futbol en México" />
+        <img src="https://sportsmedia.games/wp-content/uploads/2025/04/LIGA-MX-CLAUSURA-2025-FASE-FINAL-scaled.jpg"
+             alt="Afición del futbol en México" />
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fa-solid fa-futbol"></i> Liga MX · Clausura 2026
+            </div>
+            <p class="hero-sub">Predice los resultados y compite con tus amigos</p>
+        </div>
     </div>
 
     <section class="container">
-        <h1>Jornada</h1>
+        <h1 id="jornada-titulo">Jornada</h1>
+        <p class="seccion-label">Partidos de la jornada</p>
 
         <div id="contenedor-partidos" class="contenedor-partidos">
-            <p class="aviso">Cargando partidos...</p>
+            <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando partidos...</p>
         </div>
 
-
         <div id="contenedor-btn">
-            <a href="./llenarQuiniela.html" id="btn-llenarQuiniela">Llenar Quiniela
-                <i class="fa-regular fa-file-lines"></i></a>
+            <a href="./llenarQuiniela.html" id="btn-llenarQuiniela">
+                <i class="fa-regular fa-file-lines"></i> Llenar Quiniela
+            </a>
         </div>
     </section>
 
+    <script src="./js/nav.js"></script>
     <script src="./js/renderInicio.js"></script>
 </body>
 </html>

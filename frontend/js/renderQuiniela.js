@@ -8,7 +8,7 @@ async function renderFormPartidos() {
     const contenedor = document.getElementById('partidos-form');
 
     try {
-        const res = await fetch(`${apiURL}/getJornada`);
+        const res  = await fetch(`${apiURL}/getJornada`);
         const data = await res.json();
 
         if (!data.jornada) {
@@ -20,13 +20,17 @@ async function renderFormPartidos() {
         document.querySelector('h1').textContent = `Jornada ${numero}`;
         contenedor.dataset.jornada = numero;
 
+        // Inicializar total en barra de progreso
+        const totalEl = document.getElementById('progreso-total');
+        if (totalEl) totalEl.textContent = `/${partidos.length}`;
+
         contenedor.innerHTML = partidos.map(p => `
             <div class="partido">
                 <div class="local">
                     <img src="./img/${p.localImg}" alt="${p.local}">
                     <span class="equipo-form-nombre">${p.local}</span>
                 </div>
-                <div class="empate">E<br><span style="font-size:0.65rem;letter-spacing:0">empate</span></div>
+                <div class="empate">E<br><span style="font-size:0.6rem;letter-spacing:0">empate</span></div>
                 <div class="visita">
                     <img src="./img/${p.visitaImg}" alt="${p.visita}">
                     <span class="equipo-form-nombre">${p.visita}</span>
@@ -36,6 +40,7 @@ async function renderFormPartidos() {
         `).join('');
 
         initPartidoListeners();
+        updateProgreso();
 
     } catch (error) {
         contenedor.innerHTML = '<p class="aviso">Error al cargar los partidos.</p>';

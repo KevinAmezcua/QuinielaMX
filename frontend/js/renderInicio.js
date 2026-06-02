@@ -19,7 +19,7 @@ async function renderPartidosInicio() {
         }
 
         const { numero, partidos } = data.jornada;
-        document.querySelector('h1').textContent = `Jornada ${numero}`;
+        document.getElementById('jornada-titulo').textContent = `Jornada ${numero}`;
 
         contenedor.innerHTML = partidos.map(p => `
             <div class="tarjeta-partido">

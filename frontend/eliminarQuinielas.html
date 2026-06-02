@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,38 +13,29 @@
 <body>
     <header>
         <nav>
-            <ul class="lista-header">
-                <li>
-                    <a href="./index.html">
-                        <img src="./img/logo-ligamx.png" id="img-inicio">
-                    </a>
-                    <a href="./index.html">
-                        Inicio
-                    </a>
-                </li>
-
-                <li>
-                    <a href="./llenarQuiniela.html">
-                        Quiniela
-                    </a>
-                </li>
-
-                <li>
-                    <a href="./resultados.html">
-                        Resultados
-                    </a>
-                </li>
+            <a href="./index.html" class="nav-brand">
+                <img src="./img/logo-ligamx.png" alt="Liga MX">
+                <span>Quiniela MX</span>
+            </a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="./index.html">Inicio</a></li>
+                <li><a href="./llenarQuiniela.html">Quiniela</a></li>
+                <li><a href="./resultados.html">Resultados</a></li>
             </ul>
+            <button class="nav-toggle" id="nav-toggle" onclick="toggleNav()" aria-label="Menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </nav>
     </header>
 
     <section class="contenedor-quinielas">
         <h1>Eliminar Quinielas</h1>
         <div class="obtener-quinielas" id="obtenerTodas-quinielas">
-            <div class="quiniela"></div>
+            <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
         </div>
     </section>
-    
+
+    <script src="./js/nav.js"></script>
     <script src="./js/scriptQuinielasTarjeta.js"></script>
 </body>
 </html>

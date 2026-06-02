@@ -1,64 +1,88 @@
 .contenedor-quinielas {
-    width: 80%;
+    width: 92%;
+    max-width: 1200px;
     margin: 0 auto;
-    height: auto;
+    padding-bottom: 3rem;
 }
 
-.obtener-quinielas {
-    background-color: #F5F7FA;
-    border-radius: 20px;
-    width: 100%;
-    border: none;
-    display: grid;
-    justify-items: center;
-    grid-template-columns: repeat(4, minmax(200px, 1fr));
-    gap: 25px;
-    padding: 10px;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    margin-bottom: 40px;
-}   
+.contenedor-quinielas h1 {
+    margin-bottom: 1.5rem;
+}
 
+/* ── GRID DE TARJETAS ───────────────────── */
+.obtener-quinielas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+/* ── TARJETA ─────────────────────────────── */
 .quiniela {
-    color: black;
-    width: 150px;
-    max-width: 100%;
-    height: 310px;
-    padding: 5px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 0.8rem;
     text-align: center;
-    border: 1px solid #d2cece;
-    border-radius: 10px;
-    background-color: white;
-    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    transition: transform 0.22s, border-color 0.22s;
 }
 
 .quiniela:hover {
-    transform: scale(1.03);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border: 1px solid rgb(201, 196, 196);
-    cursor: pointer;
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.quiniela h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+    word-break: break-word;
 }
 
 .quiniela h4 {
     margin: 0;
-    padding: 3px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: normal;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+    flex: 1;
 }
 
-button {
-    background-color: #0077cc;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    transition: background-color 0.3s ease;
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    margin-top: 10px;
-    padding: 4px;
-    padding-inline: 18px;
-}
-
-button:hover {
+/* ── BOTÓN ELIMINAR ──────────────────────── */
+.quiniela button {
+    margin-top: 0.6rem;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.85rem;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 8px;
     cursor: pointer;
-    background-color: #005fa3;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    transition: background 0.2s, border-color 0.2s;
+    width: 100%;
+}
+
+.quiniela button:hover {
+    background: rgba(239, 68, 68, 0.28);
+    border-color: rgba(239, 68, 68, 0.6);
+}
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media (max-width: 1000px) {
+    .obtener-quinielas { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 700px) {
+    .obtener-quinielas { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 440px) {
+    .obtener-quinielas { grid-template-columns: 1fr; }
 }

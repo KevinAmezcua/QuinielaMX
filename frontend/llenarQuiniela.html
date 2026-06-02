@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,54 +13,61 @@
 <body>
     <header>
         <nav>
-            <ul class="lista-header">
-                <li>
-                    <a href="./index.html">
-                        <img src="./img/logo-ligamx.png" id="img-inicio">
-                    </a>
-                    <a href="./index.html">
-                        Inicio
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#" class="active">
-                        Quiniela
-                    </a>
-                </li>
-
-                <li>
-                    <a href="./resultados.html">
-                        Resultados
-                    </a>
-                </li>
+            <a href="./index.html" class="nav-brand">
+                <img src="./img/logo-ligamx.png" alt="Liga MX">
+                <span>Quiniela MX</span>
+            </a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="./index.html">Inicio</a></li>
+                <li><a href="./llenarQuiniela.html" class="active">Quiniela</a></li>
+                <li><a href="./resultados.html">Resultados</a></li>
             </ul>
+            <button class="nav-toggle" id="nav-toggle" onclick="toggleNav()" aria-label="Menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </nav>
     </header>
 
     <section class="section-form">
-        <h1>Jornada</h1>
-        <div class="form">
+
+        <!-- Encabezado con título y barra de progreso -->
+        <div class="form-header">
+            <h1>Jornada</h1>
+            <div class="progreso-wrap" id="progreso-wrap">
+                <div class="progreso-label">
+                    <span id="progreso-count">0</span>
+                    <span id="progreso-total" class="progreso-sep">/0</span>
+                    <span class="progreso-texto">seleccionados</span>
+                </div>
+                <div class="progreso-bar">
+                    <div class="progreso-fill" id="progreso-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de partidos -->
+        <div class="form-partidos">
             <div class="partido-header">
                 <div>Local</div>
                 <div></div>
                 <div>Visita</div>
             </div>
-
             <div id="partidos-form">
-                <p class="aviso">Cargando partidos...</p>
-            </div>
-
-            <div>
-                <input type="text" id="nombre" placeholder="Nombre" required>
-            </div>
-
-            <div>
-                <button onclick="enviarQuiniela()">Enviar</button>
+                <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando partidos...</p>
             </div>
         </div>
+
+        <!-- Footer sticky con nombre y enviar -->
+        <div class="form-footer">
+            <input type="text" id="nombre" placeholder="Tu nombre" autocomplete="off" required>
+            <button id="btn-enviar" onclick="enviarQuiniela()">
+                <i class="fa-solid fa-paper-plane"></i> Enviar Quiniela
+            </button>
+        </div>
+
     </section>
 
+    <script src="./js/nav.js"></script>
     <script src="./js/scriptPartidos.js"></script>
     <script src="./js/agregarQuiniela.js"></script>
     <script src="./js/renderQuiniela.js"></script>
