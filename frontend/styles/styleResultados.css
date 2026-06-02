@@ -138,6 +138,16 @@ tbody tr:hover td {
     transition: background 0.15s;
 }
 
+tbody tr:hover td.col-sticky-left,
+tbody tr:hover td.col-sticky-right {
+    background: var(--bg-card);
+}
+
+tbody tr:nth-child(even):hover td.col-sticky-left,
+tbody tr:nth-child(even):hover td.col-sticky-right {
+    background: #0b1120;
+}
+
 .ganador {
     background: rgba(34, 197, 94, 0.18) !important;
     color: var(--green) !important;

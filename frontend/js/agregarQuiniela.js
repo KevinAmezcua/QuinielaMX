@@ -43,6 +43,7 @@ async function enviarQuiniela() {
         document.getElementById('nombre').value = '';
         contenedor.querySelectorAll('.resultado-oculto').forEach(input => input.value = '');
         contenedor.querySelectorAll('.seleccionado').forEach(div => div.classList.remove('seleccionado'));
+        updateProgreso();
 
     } catch (error) {
         alert("Error al enviar la quiniela.");
