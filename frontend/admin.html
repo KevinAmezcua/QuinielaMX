@@ -62,6 +62,9 @@
                     <button class="btn-add" onclick="agregarPartido()">
                         <i class="fa-solid fa-plus"></i> Agregar partido
                     </button>
+                    <button class="btn-remove" onclick="limpiarPartidos()">
+                        <i class="fa-solid fa-broom"></i> Limpiar todos
+                    </button>
                     <button class="btn-primary" onclick="guardarJornada()">
                         <i class="fa-solid fa-floppy-disk"></i> Guardar Jornada
                     </button>
@@ -93,10 +96,15 @@
                 <i class="fa-solid fa-chevron-down card-chevron"></i>
             </h2>
             <div class="card-body">
-                <div class="admin-buttons" style="margin-bottom:1.2rem">
-                    <button class="btn-danger" onclick="borrarTodasQuinielas()">
-                        <i class="fa-solid fa-trash-can"></i> Borrar TODAS las quinielas
+                <div class="borrar-todas-wrapper">
+                    <button class="btn-danger-full" onclick="borrarTodasQuinielas()">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Borrar TODAS las quinielas
                     </button>
+                    <p class="borrar-todas-aviso">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Esta acción eliminará permanentemente las quinielas de todos los participantes.
+                    </p>
                 </div>
                 <div id="quinielas-admin-list">
                     <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>

@@ -71,6 +71,11 @@ function agregarPartido(localImg = '', visitaImg = '', fecha = '', hora = '') {
     contenedor.appendChild(div);
 }
 
+function limpiarPartidos() {
+    if (!confirm('¿Eliminar todos los partidos del formulario?')) return;
+    document.getElementById('partidos-admin').innerHTML = '';
+}
+
 function renumerarPartidos() {
     document.querySelectorAll('.partido-num').forEach((el, i) => {
         el.textContent = i + 1;
@@ -221,19 +226,38 @@ async function cargarQuinielasAdmin() {
             return;
         }
 
+        const BADGE = { local: 'L', empate: 'E', visita: 'V' };
+        const BADGE_CLS = { local: 'pred-local', empate: 'pred-empate', visita: 'pred-visita' };
+
         lista.innerHTML = '';
+        const grid = document.createElement('div');
+        grid.className = 'quinielas-admin-grid';
+
         quinielas.forEach(q => {
-            const row = document.createElement('div');
-            row.className = 'quiniela-admin-row';
-            row.dataset.id = q._id;
-            row.innerHTML = `
-                <span class="quiniela-admin-nombre">${q.nombre}</span>
-                <span class="quiniela-admin-jornada">Jornada ${q.jornada ?? '—'}</span>
-                <button class="btn-remove" onclick="eliminarQuinielaAdmin('${q._id}', '${q.nombre.replace(/'/g, "\\'")}')">
-                    <i class="fa-solid fa-trash"></i>
+            const card = document.createElement('div');
+            card.className = 'quiniela-admin-card';
+            card.dataset.id = q._id;
+
+            const predRows = q.partidos.map(p => `
+                <div class="quiniela-pred-row">
+                    <span class="pred-equipo">${p.local}</span>
+                    <span class="pred-badge ${BADGE_CLS[p.resultado] || ''}">${BADGE[p.resultado] || '?'}</span>
+                    <span class="pred-equipo pred-right">${p.visita}</span>
+                </div>`).join('');
+
+            card.innerHTML = `
+                <div class="quiniela-admin-header">
+                    <span class="quiniela-admin-nombre">${q.nombre}</span>
+                    <span class="quiniela-admin-jornada-badge">J${q.jornada ?? '—'}</span>
+                </div>
+                <div class="quiniela-admin-partidos">${predRows}</div>
+                <button class="btn-eliminar-quiniela" onclick="eliminarQuinielaAdmin('${q._id}', '${q.nombre.replace(/'/g, "\\'")}')">
+                    <i class="fa-solid fa-trash"></i> Eliminar
                 </button>`;
-            lista.appendChild(row);
+            grid.appendChild(card);
         });
+
+        lista.appendChild(grid);
     } catch {
         lista.innerHTML = '<p class="aviso" style="color:#f87171">Error al cargar las quinielas.</p>';
     }
@@ -247,10 +271,10 @@ async function eliminarQuinielaAdmin(id, nombre) {
         const data = await res.json();
 
         if (res.ok) {
-            const row = document.querySelector(`.quiniela-admin-row[data-id="${id}"]`);
-            if (row) row.remove();
+            const card = document.querySelector(`.quiniela-admin-card[data-id="${id}"]`);
+            if (card) card.remove();
             const lista = document.getElementById('quinielas-admin-list');
-            if (!lista.querySelector('.quiniela-admin-row')) {
+            if (!lista.querySelector('.quiniela-admin-card')) {
                 lista.innerHTML = '<p class="aviso">No hay quinielas registradas.</p>';
             }
         } else {
