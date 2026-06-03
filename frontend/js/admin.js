@@ -358,30 +358,6 @@ async function eliminarQuinielaAdmin(id, nombre) {
     }
 }
 
-async function borrarTodasQuinielas() {
-    const password = document.getElementById('admin-password').value;
-
-    if (!confirm('¿Estás seguro de que deseas eliminar TODAS las quinielas?\n\nEsta acción no se puede deshacer.')) return;
-    if (!confirm('Confirma de nuevo: ¿eliminar TODAS las quinielas permanentemente?')) return;
-
-    try {
-        const res = await fetch(`${apiURL}/deleteAllQuinielas`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password, jornada: _jornadaActualNum })
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-            alert(data.message);
-            cargarQuinielasAdmin();
-        } else {
-            alert(data.message || "Error al eliminar las quinielas.");
-        }
-    } catch {
-        alert("Error al conectar con el servidor.");
-    }
-}
 
 async function limpiarHistorial() {
     const password = document.getElementById('admin-password').value;

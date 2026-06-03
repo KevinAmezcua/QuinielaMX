@@ -343,6 +343,25 @@
     gap: 0.35rem;
 }
 
+/* ── AVISO INFO ELIMINAR ─────────────────── */
+.eliminar-aviso-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0.2px;
+    line-height: 1.5;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    margin-bottom: 1rem;
+}
+.eliminar-aviso-info i { color: var(--gold); margin-top: 0.1rem; flex-shrink: 0; }
+.eliminar-aviso-info strong { color: #ccc; }
+
 /* ── QUINIELAS GRID (admin) ──────────────── */
 .quinielas-admin-grid {
     display: grid;
