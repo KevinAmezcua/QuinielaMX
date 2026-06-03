@@ -27,7 +27,8 @@ app.use(cors({
 // ─── Schemas ────────────────────────────────────────────────────────────────
 
 const JornadaSchema = new mongoose.Schema({
-    numero: { type: Number, required: true, unique: true },
+    numero:    { type: Number,  required: true, unique: true },
+    archivada: { type: Boolean, default: false },
     partidos: [{
         local:     { type: String, required: true },
         localImg:  { type: String, required: true },
@@ -76,7 +77,7 @@ app.get('/getAllJornadas', async (req, res) => {
 
 app.get('/getJornada', async (req, res) => {
     try {
-        const jornada = await Jornada.findOne().sort({ numero: -1 });
+        const jornada = await Jornada.findOne({ archivada: { $ne: true } }).sort({ numero: -1 });
         if (!jornada) {
             return res.status(404).json({ message: "No hay jornada configurada." });
         }
@@ -202,6 +203,32 @@ app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
         return res.status(200).json({ message: "Quiniela eliminada con éxito." });
     } catch (error) {
         return res.status(500).json({ message: "Error al eliminar Quiniela.", error });
+    }
+});
+
+app.put('/archivarJornada', async (req, res) => {
+    try {
+        const { password, numero } = req.body;
+
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+        if (!numero) {
+            return res.status(400).json({ message: "Se requiere el número de jornada." });
+        }
+
+        const jornada = await Jornada.findOneAndUpdate(
+            { numero: parseInt(numero) },
+            { archivada: true },
+            { new: true }
+        );
+
+        if (!jornada) {
+            return res.status(404).json({ message: "Jornada no encontrada." });
+        }
+        return res.status(200).json({ message: `Jornada ${numero} archivada. Ya aparece en el historial.` });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al archivar jornada.", error });
     }
 });
 

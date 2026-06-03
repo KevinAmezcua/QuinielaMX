@@ -1,5 +1,7 @@
 const apiURL = 'https://quinielamx.onrender.com';
 
+let _jornadaActualNum = null;
+
 function toggleAdminCard(h2) {
     h2.closest('.admin-card').classList.toggle('collapsed');
 }
@@ -71,34 +73,41 @@ function agregarPartido(localImg = '', visitaImg = '', fecha = '', hora = '') {
     contenedor.appendChild(div);
 }
 
-async function limpiarPartidos() {
-    const password = document.getElementById('admin-password').value;
-    const numero = parseInt(document.getElementById('jornada-numero').value);
-
-    if (!confirm(`¿Eliminar la jornada${numero ? ' ' + numero : ''} y todos sus partidos? Esto los borrará de la base de datos.`)) return;
-
-    if (numero) {
-        try {
-            const res = await fetch(`${apiURL}/deleteJornada`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password, numero })
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                alert(data.message || "Error al eliminar la jornada.");
-                return;
-            }
-        } catch {
-            alert("Error al conectar con el servidor.");
-            return;
-        }
-    }
-
+function limpiarPartidos() {
+    if (!confirm('¿Limpiar todos los partidos del formulario?')) return;
     document.getElementById('partidos-admin').innerHTML = '';
-    document.getElementById('jornada-numero').value = '';
-    document.getElementById('resultados-admin').innerHTML = '';
-    document.getElementById('jornada-actual-info').textContent = 'No hay jornada configurada.';
+}
+
+async function archivarJornada() {
+    const password = document.getElementById('admin-password').value;
+    const numero   = _jornadaActualNum;
+
+    if (!numero) { alert("No hay jornada activa para archivar."); return; }
+
+    if (!confirm(`¿Archivar la Jornada ${numero}?\n\nLos partidos y quinielas quedarán guardados en el historial pero ya no serán la jornada activa.`)) return;
+
+    try {
+        const res = await fetch(`${apiURL}/archivarJornada`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password, numero })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(data.message);
+            _jornadaActualNum = null;
+            document.getElementById('partidos-admin').innerHTML = '';
+            document.getElementById('jornada-numero').value = '';
+            document.getElementById('resultados-admin').innerHTML = '';
+            document.getElementById('jornada-actual-info').textContent = 'No hay jornada activa.';
+            cargarQuinielasAdmin();
+        } else {
+            alert(data.message || "Error al archivar la jornada.");
+        }
+    } catch {
+        alert("Error al conectar con el servidor.");
+    }
 }
 
 function renumerarPartidos() {
@@ -199,12 +208,14 @@ async function cargarJornadaActual() {
         const data = await res.json();
 
         if (!data.jornada) {
+            _jornadaActualNum = null;
             info.textContent = 'No hay jornada configurada.';
             contenedorResultados.innerHTML = '';
             return;
         }
 
         const { numero, partidos } = data.jornada;
+        _jornadaActualNum = numero;
         info.textContent = `Jornada ${numero} — ${partidos.length} partidos`;
 
         // Campo oculto con el número de jornada para guardar resultados
@@ -239,10 +250,16 @@ async function cargarJornadaActual() {
 
 async function cargarQuinielasAdmin() {
     const lista = document.getElementById('quinielas-admin-list');
+
+    if (!_jornadaActualNum) {
+        lista.innerHTML = '<p class="aviso">No hay jornada activa. Las jornadas archivadas aparecen en el historial de Resultados.</p>';
+        return;
+    }
+
     lista.innerHTML = '<p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
 
     try {
-        const res = await fetch(`${apiURL}/getQuiniela`);
+        const res = await fetch(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
         const data = await res.json();
         const quinielas = data.quinielas;
 
@@ -320,7 +337,7 @@ async function borrarTodasQuinielas() {
         const res = await fetch(`${apiURL}/deleteAllQuinielas`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
+            body: JSON.stringify({ password, jornada: _jornadaActualNum })
         });
         const data = await res.json();
 
