@@ -196,6 +196,26 @@ app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
     }
 });
 
+app.delete('/deleteJornada', async (req, res) => {
+    try {
+        const { password, numero } = req.body;
+
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+
+        const filter = numero ? { numero: parseInt(numero) } : {};
+        const deleted = await Jornada.findOneAndDelete(filter);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Jornada no encontrada." });
+        }
+        return res.status(200).json({ message: "Jornada eliminada con éxito." });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al eliminar jornada.", error });
+    }
+});
+
 app.delete('/deleteAllQuinielas', async (req, res) => {
     try {
         const { password, jornada } = req.body;

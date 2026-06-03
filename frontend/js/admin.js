@@ -71,9 +71,34 @@ function agregarPartido(localImg = '', visitaImg = '', fecha = '', hora = '') {
     contenedor.appendChild(div);
 }
 
-function limpiarPartidos() {
-    if (!confirm('¿Eliminar todos los partidos del formulario?')) return;
+async function limpiarPartidos() {
+    const password = document.getElementById('admin-password').value;
+    const numero = parseInt(document.getElementById('jornada-numero').value);
+
+    if (!confirm(`¿Eliminar la jornada${numero ? ' ' + numero : ''} y todos sus partidos? Esto los borrará de la base de datos.`)) return;
+
+    if (numero) {
+        try {
+            const res = await fetch(`${apiURL}/deleteJornada`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password, numero })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.message || "Error al eliminar la jornada.");
+                return;
+            }
+        } catch {
+            alert("Error al conectar con el servidor.");
+            return;
+        }
+    }
+
     document.getElementById('partidos-admin').innerHTML = '';
+    document.getElementById('jornada-numero').value = '';
+    document.getElementById('resultados-admin').innerHTML = '';
+    document.getElementById('jornada-actual-info').textContent = 'No hay jornada configurada.';
 }
 
 function renumerarPartidos() {
