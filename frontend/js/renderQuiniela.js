@@ -16,9 +16,21 @@ async function renderFormPartidos() {
             return;
         }
 
-        const { numero, partidos } = data.jornada;
+        const { numero, partidos, enviosAbiertos } = data.jornada;
         document.querySelector('h1').textContent = `Jornada ${numero}`;
         contenedor.dataset.jornada = numero;
+
+        if (enviosAbiertos === false) {
+            document.querySelector('.form-footer').style.display = 'none';
+            document.getElementById('progreso-wrap').style.display = 'none';
+            contenedor.innerHTML = `
+                <div class="aviso-cerrado">
+                    <i class="fa-solid fa-lock"></i>
+                    <p>Envíos cerrados</p>
+                    <span>Ya no es posible enviar quinielas para esta jornada.</span>
+                </div>`;
+            return;
+        }
 
         // Inicializar total en barra de progreso
         const totalEl = document.getElementById('progreso-total');

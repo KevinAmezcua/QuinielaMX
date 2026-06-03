@@ -27,8 +27,9 @@ app.use(cors({
 // ─── Schemas ────────────────────────────────────────────────────────────────
 
 const JornadaSchema = new mongoose.Schema({
-    numero:    { type: Number,  required: true, unique: true },
-    archivada: { type: Boolean, default: false },
+    numero:         { type: Number,  required: true, unique: true },
+    archivada:      { type: Boolean, default: false },
+    enviosAbiertos: { type: Boolean, default: true },
     partidos: [{
         local:     { type: String, required: true },
         localImg:  { type: String, required: true },
@@ -165,6 +166,10 @@ app.post('/newQuiniela', async (req, res) => {
         const jornadaActual = await Jornada.findOne().sort({ numero: -1 });
         const expectedCount = jornadaActual ? jornadaActual.partidos.length : 9;
 
+        if (jornadaActual && jornadaActual.enviosAbiertos === false) {
+            return res.status(403).json({ message: "Los envíos están cerrados para esta jornada." });
+        }
+
         if (!nombre || !Array.isArray(partidos) || partidos.length !== expectedCount) {
             return res.status(400).json({
                 message: `Datos inválidos. Debes enviar nombre y exactamente ${expectedCount} partidos.`
@@ -229,6 +234,34 @@ app.put('/archivarJornada', async (req, res) => {
         return res.status(200).json({ message: `Jornada ${numero} archivada. Ya aparece en el historial.` });
     } catch (error) {
         return res.status(500).json({ message: "Error al archivar jornada.", error });
+    }
+});
+
+app.put('/toggleEnvios', async (req, res) => {
+    try {
+        const { password, numero } = req.body;
+
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+        if (!numero) {
+            return res.status(400).json({ message: "Se requiere el número de jornada." });
+        }
+
+        const jornada = await Jornada.findOne({ numero: parseInt(numero) });
+        if (!jornada) {
+            return res.status(404).json({ message: "Jornada no encontrada." });
+        }
+
+        jornada.enviosAbiertos = !jornada.enviosAbiertos;
+        await jornada.save();
+
+        return res.status(200).json({
+            message: `Envíos ${jornada.enviosAbiertos ? 'activados' : 'desactivados'}.`,
+            enviosAbiertos: jornada.enviosAbiertos
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al cambiar el estado de envíos.", error });
     }
 });
 

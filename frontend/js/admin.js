@@ -230,6 +230,55 @@ async function guardarResultados() {
     }
 }
 
+function actualizarBannerEnvios(abiertos) {
+    const banner  = document.getElementById('envios-banner');
+    const icon    = document.getElementById('envios-icon');
+    const titulo  = document.getElementById('envios-titulo');
+    const desc    = document.getElementById('envios-desc');
+    const btn     = document.getElementById('btn-toggle-envios');
+    if (!banner) return;
+
+    banner.style.display = 'flex';
+
+    if (abiertos) {
+        banner.className = 'envios-banner envios-banner--abierto';
+        icon.className   = 'fa-solid fa-paper-plane envios-banner-icon';
+        titulo.textContent = 'Envíos abiertos';
+        desc.textContent   = 'Los participantes pueden enviar su quiniela.';
+        btn.innerHTML      = '<i class="fa-solid fa-lock"></i> Cerrar Envíos';
+        btn.className      = 'btn-toggle-envios btn-cerrar-envios';
+    } else {
+        banner.className = 'envios-banner envios-banner--cerrado';
+        icon.className   = 'fa-solid fa-lock envios-banner-icon';
+        titulo.textContent = 'Envíos cerrados';
+        desc.textContent   = 'Los participantes no pueden enviar quinielas.';
+        btn.innerHTML      = '<i class="fa-solid fa-lock-open"></i> Abrir Envíos';
+        btn.className      = 'btn-toggle-envios btn-abrir-envios';
+    }
+}
+
+async function toggleEnvios() {
+    const password = document.getElementById('admin-password').value;
+    const numero   = _jornadaActualNum;
+    if (!numero) { alert("No hay jornada activa."); return; }
+
+    try {
+        const res = await fetch(`${apiURL}/toggleEnvios`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password, numero })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            actualizarBannerEnvios(data.enviosAbiertos);
+        } else {
+            alert(data.message || "Error al cambiar el estado de envíos.");
+        }
+    } catch {
+        alert("Error al conectar con el servidor.");
+    }
+}
+
 async function cargarJornadaActual() {
     const info = document.getElementById('jornada-actual-info');
     const contenedorResultados = document.getElementById('resultados-admin');
@@ -242,12 +291,15 @@ async function cargarJornadaActual() {
             _jornadaActualNum = null;
             info.textContent = 'No hay jornada configurada.';
             contenedorResultados.innerHTML = '';
+            const banner = document.getElementById('envios-banner');
+            if (banner) banner.style.display = 'none';
             return;
         }
 
-        const { numero, partidos } = data.jornada;
+        const { numero, partidos, enviosAbiertos } = data.jornada;
         _jornadaActualNum = numero;
         info.textContent = `Jornada ${numero} — ${partidos.length} partidos`;
+        actualizarBannerEnvios(enviosAbiertos !== false);
 
         // Campo oculto con el número de jornada para guardar resultados
         contenedorResultados.innerHTML = `<input type="hidden" id="resultados-jornada-num" value="${numero}">`;

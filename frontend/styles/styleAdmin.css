@@ -302,6 +302,80 @@
     .archivar-banner .btn-archive { width: 100%; justify-content: center; }
 }
 
+/* ── ENVÍOS BANNER ────────────────────────── */
+.envios-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.envios-banner--abierto {
+    background: rgba(34, 197, 94, 0.04);
+    border: 1px solid rgba(34, 197, 94, 0.18);
+    border-left: 3px solid var(--green);
+}
+
+.envios-banner--cerrado {
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-left: 3px solid #ef4444;
+}
+
+.envios-banner-icon {
+    font-size: 1.6rem;
+    opacity: 0.65;
+    flex-shrink: 0;
+}
+
+.envios-banner--abierto .envios-banner-icon { color: var(--green); }
+.envios-banner--cerrado .envios-banner-icon { color: #f87171; }
+
+.btn-toggle-envios {
+    padding: 0.55rem 1.3rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.btn-cerrar-envios {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+.btn-cerrar-envios:hover {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: rgba(239, 68, 68, 0.6);
+    transform: translateY(-1px);
+}
+
+.btn-abrir-envios {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+.btn-abrir-envios:hover {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.6);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 500px) {
+    .envios-banner { flex-direction: column; align-items: flex-start; }
+    .btn-toggle-envios { width: 100%; justify-content: center; }
+}
+
 /* ── BORRAR TODAS ─────────────────────────── */
 .borrar-todas-wrapper {
     margin-bottom: 1.4rem;

@@ -79,6 +79,18 @@
                         <i class="fa-solid fa-box-archive"></i> Archivar
                     </button>
                 </div>
+
+                <!-- Toggle envíos -->
+                <div class="envios-banner envios-banner--abierto" id="envios-banner" style="display:none">
+                    <i class="fa-solid fa-paper-plane envios-banner-icon" id="envios-icon"></i>
+                    <div class="archivar-banner-content">
+                        <span class="archivar-banner-titulo" id="envios-titulo">Envíos abiertos</span>
+                        <span class="archivar-banner-desc" id="envios-desc">Los participantes pueden enviar su quiniela.</span>
+                    </div>
+                    <button class="btn-toggle-envios btn-cerrar-envios" id="btn-toggle-envios" onclick="toggleEnvios()">
+                        <i class="fa-solid fa-lock"></i> Cerrar Envíos
+                    </button>
+                </div>
             </div>
         </div>
 
