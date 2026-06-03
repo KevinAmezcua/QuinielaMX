@@ -352,6 +352,30 @@ async function borrarTodasQuinielas() {
     }
 }
 
+async function limpiarHistorial() {
+    const password = document.getElementById('admin-password').value;
+
+    if (!confirm('¿Eliminar todo el historial?\n\nSe borrarán permanentemente todas las jornadas archivadas y sus quinielas.')) return;
+    if (!confirm('Confirma de nuevo: ¿eliminar el historial completo? Esta acción no se puede deshacer.')) return;
+
+    try {
+        const res = await fetch(`${apiURL}/deleteHistorial`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(data.message);
+        } else {
+            alert(data.message || "Error al limpiar el historial.");
+        }
+    } catch {
+        alert("Error al conectar con el servidor.");
+    }
+}
+
 async function verificarAdmin() {
     const password = document.getElementById('admin-password').value;
     const errorEl  = document.getElementById('password-error');
@@ -378,6 +402,7 @@ async function verificarAdmin() {
             document.getElementById('card-jornada').style.display   = 'block';
             document.getElementById('card-resultados').style.display = 'block';
             document.getElementById('card-eliminar').style.display   = 'block';
+            document.getElementById('card-historial').style.display  = 'block';
             document.getElementById('admin-password').disabled = true;
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-check"></i> Verificado';

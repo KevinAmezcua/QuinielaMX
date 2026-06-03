@@ -252,6 +252,28 @@ app.delete('/deleteJornada', async (req, res) => {
     }
 });
 
+app.delete('/deleteHistorial', async (req, res) => {
+    try {
+        const { password } = req.body;
+
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+
+        const archivadas = await Jornada.find({ archivada: true }, 'numero');
+        const numeros    = archivadas.map(j => j.numero);
+
+        const quinielasResult = await Quiniela.deleteMany({ jornada: { $in: numeros } });
+        const jornadasResult  = await Jornada.deleteMany({ archivada: true });
+
+        return res.status(200).json({
+            message: `Historial eliminado: ${jornadasResult.deletedCount} jornada(s) y ${quinielasResult.deletedCount} quiniela(s).`
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al limpiar el historial.", error });
+    }
+});
+
 app.delete('/deleteAllQuinielas', async (req, res) => {
     try {
         const { password, jornada } = req.body;

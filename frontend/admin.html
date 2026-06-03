@@ -121,6 +121,26 @@
                 </div>
             </div>
         </div>
+
+        <!-- Historial -->
+        <div class="admin-card" id="card-historial" style="display:none">
+            <h2 class="card-toggle" onclick="toggleAdminCard(this)">
+                <span><i class="fa-solid fa-clock-rotate-left"></i> Historial</span>
+                <i class="fa-solid fa-chevron-down card-chevron"></i>
+            </h2>
+            <div class="card-body">
+                <div class="borrar-todas-wrapper">
+                    <button class="btn-danger-full" onclick="limpiarHistorial()">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Limpiar Historial
+                    </button>
+                    <p class="borrar-todas-aviso">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Elimina permanentemente todas las jornadas archivadas y sus quinielas.
+                    </p>
+                </div>
+            </div>
+        </div>
     </section>
 
     <script src="./js/nav.js"></script>
