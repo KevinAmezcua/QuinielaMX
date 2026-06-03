@@ -196,6 +196,23 @@ app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
     }
 });
 
+app.delete('/deleteAllQuinielas', async (req, res) => {
+    try {
+        const { password, jornada } = req.body;
+
+        if (password !== ADMIN_PASSWORD) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+
+        const filter = jornada ? { jornada: parseInt(jornada) } : {};
+        const result = await Quiniela.deleteMany(filter);
+
+        return res.status(200).json({ message: `${result.deletedCount} quiniela(s) eliminada(s).`, deletedCount: result.deletedCount });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al eliminar quinielas.", error });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en puerto ${PORT}`);
 });

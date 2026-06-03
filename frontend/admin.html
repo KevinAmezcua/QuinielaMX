@@ -93,11 +93,13 @@
                 <i class="fa-solid fa-chevron-down card-chevron"></i>
             </h2>
             <div class="card-body">
-                <p style="color:var(--muted);font-size:0.9rem;margin:0 0 1rem">Administra y elimina las quinielas registradas.</p>
-                <div class="admin-buttons">
-                    <a href="./eliminarQuinielas.html" class="btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;">
-                        <i class="fa-solid fa-arrow-right"></i> Ir a Eliminar Quinielas
-                    </a>
+                <div class="admin-buttons" style="margin-bottom:1.2rem">
+                    <button class="btn-danger" onclick="borrarTodasQuinielas()">
+                        <i class="fa-solid fa-trash-can"></i> Borrar TODAS las quinielas
+                    </button>
+                </div>
+                <div id="quinielas-admin-list">
+                    <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
                 </div>
             </div>
         </div>

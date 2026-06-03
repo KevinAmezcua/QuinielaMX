@@ -207,6 +207,85 @@ async function cargarJornadaActual() {
     }
 }
 
+async function cargarQuinielasAdmin() {
+    const lista = document.getElementById('quinielas-admin-list');
+    lista.innerHTML = '<p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
+
+    try {
+        const res = await fetch(`${apiURL}/getQuiniela`);
+        const data = await res.json();
+        const quinielas = data.quinielas;
+
+        if (!quinielas || quinielas.length === 0) {
+            lista.innerHTML = '<p class="aviso">No hay quinielas registradas.</p>';
+            return;
+        }
+
+        lista.innerHTML = '';
+        quinielas.forEach(q => {
+            const row = document.createElement('div');
+            row.className = 'quiniela-admin-row';
+            row.dataset.id = q._id;
+            row.innerHTML = `
+                <span class="quiniela-admin-nombre">${q.nombre}</span>
+                <span class="quiniela-admin-jornada">Jornada ${q.jornada ?? '—'}</span>
+                <button class="btn-remove" onclick="eliminarQuinielaAdmin('${q._id}', '${q.nombre.replace(/'/g, "\\'")}')">
+                    <i class="fa-solid fa-trash"></i>
+                </button>`;
+            lista.appendChild(row);
+        });
+    } catch {
+        lista.innerHTML = '<p class="aviso" style="color:#f87171">Error al cargar las quinielas.</p>';
+    }
+}
+
+async function eliminarQuinielaAdmin(id, nombre) {
+    if (!confirm(`¿Eliminar la quiniela de "${nombre}"?`)) return;
+
+    try {
+        const res = await fetch(`${apiURL}/deleteQuiniela/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+
+        if (res.ok) {
+            const row = document.querySelector(`.quiniela-admin-row[data-id="${id}"]`);
+            if (row) row.remove();
+            const lista = document.getElementById('quinielas-admin-list');
+            if (!lista.querySelector('.quiniela-admin-row')) {
+                lista.innerHTML = '<p class="aviso">No hay quinielas registradas.</p>';
+            }
+        } else {
+            alert(data.message || "Error al eliminar.");
+        }
+    } catch {
+        alert("Error al eliminar la quiniela.");
+    }
+}
+
+async function borrarTodasQuinielas() {
+    const password = document.getElementById('admin-password').value;
+
+    if (!confirm('¿Estás seguro de que deseas eliminar TODAS las quinielas?\n\nEsta acción no se puede deshacer.')) return;
+    if (!confirm('Confirma de nuevo: ¿eliminar TODAS las quinielas permanentemente?')) return;
+
+    try {
+        const res = await fetch(`${apiURL}/deleteAllQuinielas`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(data.message);
+            cargarQuinielasAdmin();
+        } else {
+            alert(data.message || "Error al eliminar las quinielas.");
+        }
+    } catch {
+        alert("Error al conectar con el servidor.");
+    }
+}
+
 async function verificarAdmin() {
     const password = document.getElementById('admin-password').value;
     const errorEl  = document.getElementById('password-error');
@@ -239,6 +318,7 @@ async function verificarAdmin() {
             btn.style.background = 'var(--green)';
             for (let i = 0; i < 9; i++) agregarPartido();
             cargarJornadaActual();
+            cargarQuinielasAdmin();
         } else {
             errorEl.style.display = 'block';
             errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Contraseña incorrecta.';
