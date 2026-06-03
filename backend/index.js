@@ -16,8 +16,12 @@ if (!process.env.JWT_SECRET) {
     console.error("Error: La variable JWT_SECRET no está definida.");
     process.exit(1);
 }
+if (!process.env.ADMIN_PASSWORD) {
+    console.error("Error: La variable ADMIN_PASSWORD no está definida.");
+    process.exit(1);
+}
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'keadt';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Max 5 intentos de login por IP cada 15 min
