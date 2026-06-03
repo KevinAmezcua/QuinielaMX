@@ -347,20 +347,44 @@
 .eliminar-aviso-info {
     display: flex;
     align-items: flex-start;
-    gap: 0.5rem;
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    letter-spacing: 0.2px;
-    line-height: 1.5;
+    gap: 0.6rem;
     background: rgba(255,255,255,0.03);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 0.7rem 0.9rem;
+    padding: 0.8rem 1rem;
     margin-bottom: 1rem;
 }
-.eliminar-aviso-info i { color: var(--gold); margin-top: 0.1rem; flex-shrink: 0; }
-.eliminar-aviso-info strong { color: #ccc; }
+.eliminar-aviso-info > i {
+    color: var(--gold);
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+}
+.eliminar-aviso-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.eliminar-aviso-texto > span:first-child {
+    color: #bbb;
+    font-size: 0.82rem;
+    letter-spacing: 0.2px;
+}
+.eliminar-aviso-guia {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+.eliminar-aviso-guia span {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+.eliminar-aviso-guia i { color: var(--gold); font-size: 0.72rem; }
+.eliminar-aviso-guia strong { color: #ddd; font-weight: 600; }
 
 /* ── QUINIELAS GRID (admin) ──────────────── */
 .quinielas-admin-grid {
