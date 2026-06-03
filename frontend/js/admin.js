@@ -2,6 +2,11 @@ const apiURL = 'https://quinielamx.onrender.com';
 
 let _jornadaActualNum = null;
 
+function adminHeaders() {
+    const token = sessionStorage.getItem('adminToken');
+    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+}
+
 function toggleAdminCard(h2) {
     h2.closest('.admin-card').classList.toggle('collapsed');
 }
@@ -110,8 +115,7 @@ function limpiarPartidos() {
 }
 
 async function archivarJornada() {
-    const password = document.getElementById('admin-password').value;
-    const numero   = _jornadaActualNum;
+    const numero = _jornadaActualNum;
 
     if (!numero) { alert("No hay jornada activa para archivar."); return; }
 
@@ -120,8 +124,8 @@ async function archivarJornada() {
     try {
         const res = await fetch(`${apiURL}/archivarJornada`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password, numero })
+            headers: adminHeaders(),
+            body: JSON.stringify({ numero })
         });
         const data = await res.json();
 
@@ -161,11 +165,9 @@ function previewTeam(select, imgId) {
 }
 
 async function guardarJornada() {
-    const password = document.getElementById('admin-password').value;
     const numero = parseInt(document.getElementById('jornada-numero').value);
 
-    if (!password) { alert("Ingresa la contraseña."); return; }
-    if (!numero)   { alert("Ingresa el número de jornada."); return; }
+    if (!numero) { alert("Ingresa el número de jornada."); return; }
 
     const filas = document.querySelectorAll('.partido-admin');
     const partidos = [];
@@ -195,8 +197,8 @@ async function guardarJornada() {
     try {
         const res = await fetch(`${apiURL}/setJornada`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password, numero, partidos })
+            headers: adminHeaders(),
+            body: JSON.stringify({ numero, partidos })
         });
         const data = await res.json();
         alert(data.message);
@@ -207,9 +209,6 @@ async function guardarJornada() {
 }
 
 async function guardarResultados() {
-    const password = document.getElementById('admin-password').value;
-    if (!password) { alert("Ingresa la contraseña."); return; }
-
     const numeroEl = document.getElementById('resultados-jornada-num');
     if (!numeroEl) { alert("Carga primero la jornada."); return; }
     const numero = parseInt(numeroEl.value);
@@ -220,8 +219,8 @@ async function guardarResultados() {
     try {
         const res = await fetch(`${apiURL}/setResultados`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password, numero, resultados })
+            headers: adminHeaders(),
+            body: JSON.stringify({ numero, resultados })
         });
         const data = await res.json();
         alert(data.message);
@@ -258,15 +257,14 @@ function actualizarBannerEnvios(abiertos) {
 }
 
 async function toggleEnvios() {
-    const password = document.getElementById('admin-password').value;
-    const numero   = _jornadaActualNum;
+    const numero = _jornadaActualNum;
     if (!numero) { alert("No hay jornada activa."); return; }
 
     try {
         const res = await fetch(`${apiURL}/toggleEnvios`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password, numero })
+            headers: adminHeaders(),
+            body: JSON.stringify({ numero })
         });
         const data = await res.json();
         if (res.ok) {
@@ -412,16 +410,13 @@ async function eliminarQuinielaAdmin(id, nombre) {
 
 
 async function limpiarHistorial() {
-    const password = document.getElementById('admin-password').value;
-
     if (!confirm('¿Eliminar todo el historial?\n\nSe borrarán permanentemente todas las jornadas archivadas y sus quinielas.')) return;
     if (!confirm('Confirma de nuevo: ¿eliminar el historial completo? Esta acción no se puede deshacer.')) return;
 
     try {
         const res = await fetch(`${apiURL}/deleteHistorial`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
+            headers: adminHeaders()
         });
         const data = await res.json();
 
@@ -457,6 +452,8 @@ async function verificarAdmin() {
         });
 
         if (res.ok) {
+            const data = await res.json();
+            sessionStorage.setItem('adminToken', data.token);
             errorEl.style.display = 'none';
             document.getElementById('card-jornada').style.display   = 'block';
             document.getElementById('card-resultados').style.display = 'block';

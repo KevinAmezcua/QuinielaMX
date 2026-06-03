@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -10,8 +12,35 @@ if (!process.env.MONGO_URI) {
     console.error("Error: La variable MONGO_URI no está definida.");
     process.exit(1);
 }
+if (!process.env.JWT_SECRET) {
+    console.error("Error: La variable JWT_SECRET no está definida.");
+    process.exit(1);
+}
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'keadt';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Max 5 intentos de login por IP cada 15 min
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { ok: false, message: 'Demasiados intentos fallidos. Espera 15 minutos.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+function requireAdmin(req, res, next) {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'No autorizado.' });
+    }
+    try {
+        jwt.verify(auth.slice(7), JWT_SECRET);
+        next();
+    } catch {
+        return res.status(401).json({ message: 'Sesión expirada. Vuelve a iniciar sesión.' });
+    }
+}
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Conectado"))
@@ -55,10 +84,11 @@ const Quiniela = mongoose.model('Quiniela', QuinielaSchema);
 
 // ─── Jornada endpoints ───────────────────────────────────────────────────────
 
-app.post('/verifyAdmin', (req, res) => {
+app.post('/verifyAdmin', loginLimiter, (req, res) => {
     const { password } = req.body;
     if (password === ADMIN_PASSWORD) {
-        return res.status(200).json({ ok: true });
+        const token = jwt.sign({ admin: true }, JWT_SECRET, { expiresIn: '8h' });
+        return res.status(200).json({ ok: true, token });
     }
     return res.status(401).json({ ok: false, message: "Contraseña incorrecta." });
 });
@@ -88,13 +118,10 @@ app.get('/getJornada', async (req, res) => {
     }
 });
 
-app.put('/setJornada', async (req, res) => {
+app.put('/setJornada', requireAdmin, async (req, res) => {
     try {
-        const { password, numero, partidos } = req.body;
+        const { numero, partidos } = req.body;
 
-        if (password !== ADMIN_PASSWORD) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
         if (!numero || !Array.isArray(partidos) || partidos.length === 0) {
             return res.status(400).json({ message: "Datos inválidos. Se requiere numero y partidos." });
         }
@@ -116,13 +143,9 @@ app.put('/setJornada', async (req, res) => {
     }
 });
 
-app.put('/setResultados', async (req, res) => {
+app.put('/setResultados', requireAdmin, async (req, res) => {
     try {
-        const { password, numero, resultados } = req.body;
-
-        if (password !== ADMIN_PASSWORD) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
+        const { numero, resultados } = req.body;
 
         const jornada = await Jornada.findOne({ numero });
         if (!jornada) {
@@ -197,7 +220,7 @@ app.post('/newQuiniela', async (req, res) => {
     }
 });
 
-app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
+app.delete('/deleteQuiniela/:quinielaId', requireAdmin, async (req, res) => {
     try {
         const quinielaId = req.params.quinielaId;
         const deleted = await Quiniela.findByIdAndDelete(quinielaId);
@@ -211,13 +234,10 @@ app.delete('/deleteQuiniela/:quinielaId', async (req, res) => {
     }
 });
 
-app.put('/archivarJornada', async (req, res) => {
+app.put('/archivarJornada', requireAdmin, async (req, res) => {
     try {
-        const { password, numero } = req.body;
+        const { numero } = req.body;
 
-        if (password !== ADMIN_PASSWORD) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
         if (!numero) {
             return res.status(400).json({ message: "Se requiere el número de jornada." });
         }
@@ -237,13 +257,10 @@ app.put('/archivarJornada', async (req, res) => {
     }
 });
 
-app.put('/toggleEnvios', async (req, res) => {
+app.put('/toggleEnvios', requireAdmin, async (req, res) => {
     try {
-        const { password, numero } = req.body;
+        const { numero } = req.body;
 
-        if (password !== ADMIN_PASSWORD) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
         if (!numero) {
             return res.status(400).json({ message: "Se requiere el número de jornada." });
         }
@@ -265,13 +282,9 @@ app.put('/toggleEnvios', async (req, res) => {
     }
 });
 
-app.delete('/deleteJornada', async (req, res) => {
+app.delete('/deleteJornada', requireAdmin, async (req, res) => {
     try {
-        const { password, numero } = req.body;
-
-        if (password !== ADMIN_PASSWORD) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
+        const { numero } = req.body;
 
         const filter = numero ? { numero: parseInt(numero) } : {};
         const deleted = await Jornada.findOneAndDelete(filter);
@@ -285,14 +298,8 @@ app.delete('/deleteJornada', async (req, res) => {
     }
 });
 
-app.delete('/deleteHistorial', async (req, res) => {
+app.delete('/deleteHistorial', requireAdmin, async (req, res) => {
     try {
-        const { password } = req.body;
-
-        if (password !== ADMIN_PASSWORD) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
-
         const archivadas = await Jornada.find({ archivada: true }, 'numero');
         const numeros    = archivadas.map(j => j.numero);
 
@@ -307,13 +314,9 @@ app.delete('/deleteHistorial', async (req, res) => {
     }
 });
 
-app.delete('/deleteAllQuinielas', async (req, res) => {
+app.delete('/deleteAllQuinielas', requireAdmin, async (req, res) => {
     try {
-        const { password, jornada } = req.body;
-
-        if (password !== ADMIN_PASSWORD) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
+        const { jornada } = req.body;
 
         const filter = jornada ? { jornada: parseInt(jornada) } : {};
         const result = await Quiniela.deleteMany(filter);
