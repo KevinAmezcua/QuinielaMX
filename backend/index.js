@@ -65,6 +65,15 @@ app.get('/', (req, res) => {
     res.json({ message: "Bienvenido" });
 });
 
+app.get('/getAllJornadas', async (req, res) => {
+    try {
+        const jornadas = await Jornada.find().sort({ numero: -1 });
+        return res.status(200).json({ jornadas });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al obtener jornadas.", error });
+    }
+});
+
 app.get('/getJornada', async (req, res) => {
     try {
         const jornada = await Jornada.findOne().sort({ numero: -1 });
