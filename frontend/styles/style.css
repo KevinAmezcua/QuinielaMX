@@ -116,7 +116,6 @@ nav {
 /* ── NAV MÓVIL ───────────────────────────── */
 @media (max-width: 640px) {
     .nav-toggle { display: flex; }
-    .nav-brand span { display: none; }
 
     .nav-links {
         position: fixed;
