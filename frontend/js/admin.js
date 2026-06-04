@@ -7,8 +7,22 @@ function adminHeaders() {
     return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 }
 
-function toggleAdminCard(h2) {
-    h2.closest('.admin-card').classList.toggle('collapsed');
+function switchTab(name) {
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === name);
+    });
+    document.querySelectorAll('.admin-section').forEach(sec => {
+        sec.style.display = 'none';
+    });
+    const tabMap = {
+        jornada:       'card-jornada',
+        resultados:    'card-resultados',
+        participantes: 'card-participantes',
+        eliminar:      'card-eliminar',
+        historial:     'card-historial'
+    };
+    const el = document.getElementById(tabMap[name]);
+    if (el) el.style.display = 'block';
 }
 
 // ── MUNDIAL 2026 ── para regresar a Liga MX reemplaza este bloque con el comentado al final del archivo
@@ -430,6 +444,112 @@ async function limpiarHistorial() {
     }
 }
 
+async function actualizarPago(id, estado, selectEl) {
+    selectEl.disabled = true;
+    try {
+        const res = await fetch(`${apiURL}/updatePago/${id}`, {
+            method: 'PATCH',
+            headers: adminHeaders(),
+            body: JSON.stringify({ estadoPago: estado })
+        });
+        if (res.ok) {
+            selectEl.className = `pago-estado-select pago-estado--${estado}`;
+            actualizarResumenPagos();
+        } else {
+            alert("Error al actualizar el estado de pago.");
+            selectEl.value = estado === 'pagado' ? 'pendiente' : 'pagado';
+        }
+    } catch {
+        alert("Error al conectar con el servidor.");
+    } finally {
+        selectEl.disabled = false;
+    }
+}
+
+function actualizarResumenPagos() {
+    const selects = document.querySelectorAll('.pago-estado-select');
+    const total   = selects.length;
+    const pagados = Array.from(selects).filter(s => s.value === 'pagado').length;
+    const resumen = document.getElementById('participantes-resumen');
+    if (resumen) {
+        resumen.innerHTML = `
+            <span class="resumen-chip resumen-pagados"><i class="fa-solid fa-circle-check"></i> ${pagados} pagado${pagados !== 1 ? 's' : ''}</span>
+            <span class="resumen-chip resumen-pendientes"><i class="fa-solid fa-clock"></i> ${total - pagados} pendiente${(total - pagados) !== 1 ? 's' : ''}</span>`;
+    }
+}
+
+async function cargarParticipantes() {
+    const lista = document.getElementById('participantes-admin-list');
+
+    if (!_jornadaActualNum) {
+        lista.innerHTML = '<p class="aviso">No hay jornada activa. Los participantes aparecen cuando hay una jornada configurada.</p>';
+        return;
+    }
+
+    lista.innerHTML = '<p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
+
+    try {
+        const res = await fetch(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
+        const data = await res.json();
+        const quinielas = data.quinielas;
+
+        if (!quinielas || quinielas.length === 0) {
+            lista.innerHTML = '<p class="aviso">No hay participantes registrados en esta jornada.</p>';
+            return;
+        }
+
+        lista.innerHTML = '';
+
+        const topBar = document.createElement('div');
+        topBar.className = 'participantes-top-bar';
+        topBar.innerHTML = `
+            <p class="participantes-counter">
+                <i class="fa-solid fa-users"></i>
+                ${quinielas.length} participante${quinielas.length !== 1 ? 's' : ''} — Jornada ${_jornadaActualNum}
+            </p>
+            <div class="participantes-resumen" id="participantes-resumen"></div>`;
+        lista.appendChild(topBar);
+
+        const tabla = document.createElement('div');
+        tabla.className = 'participantes-tabla';
+
+        const header = document.createElement('div');
+        header.className = 'participante-row participante-row--header';
+        header.innerHTML = `
+            <span>#</span>
+            <span>Nombre</span>
+            <span>Celular</span>
+            <span>Pago</span>`;
+        tabla.appendChild(header);
+
+        quinielas.forEach((q, i) => {
+            const row = document.createElement('div');
+            row.className = 'participante-row';
+            const celularHTML = q.celular
+                ? `<a href="tel:${q.celular}" class="celular-link"><i class="fa-solid fa-phone"></i> ${q.celular}</a>`
+                : `<span class="sin-celular">—</span>`;
+            const estado = q.estadoPago || 'pendiente';
+            row.innerHTML = `
+                <span class="participante-num">${i + 1}</span>
+                <span class="participante-nombre">${q.nombre || '—'}</span>
+                <span class="participante-celular">${celularHTML}</span>
+                <span class="participante-pago">
+                    <select class="pago-estado-select pago-estado--${estado}"
+                            onchange="actualizarPago('${q._id}', this.value, this)">
+                        <option value="pendiente" ${estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="pagado"    ${estado === 'pagado'    ? 'selected' : ''}>Pagado</option>
+                    </select>
+                </span>`;
+            tabla.appendChild(row);
+        });
+
+        lista.appendChild(tabla);
+        actualizarResumenPagos();
+    } catch {
+        lista.innerHTML = '<p class="aviso" style="color:#f87171">Error al cargar los participantes.</p>';
+    }
+}
+
 async function verificarAdmin() {
     const password = document.getElementById('admin-password').value;
     const errorEl  = document.getElementById('password-error');
@@ -455,17 +575,16 @@ async function verificarAdmin() {
             const data = await res.json();
             sessionStorage.setItem('adminToken', data.token);
             errorEl.style.display = 'none';
-            document.getElementById('card-jornada').style.display   = 'block';
-            document.getElementById('card-resultados').style.display = 'block';
-            document.getElementById('card-eliminar').style.display   = 'block';
-            document.getElementById('card-historial').style.display  = 'block';
             document.getElementById('admin-password').disabled = true;
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-check"></i> Verificado';
             btn.style.background = 'var(--green)';
+            document.getElementById('admin-tab-bar').style.display = 'flex';
+            switchTab('jornada');
             for (let i = 0; i < 9; i++) agregarPartido();
             await cargarJornadaActual();
             cargarQuinielasAdmin();
+            cargarParticipantes();
         } else {
             errorEl.style.display = 'block';
             errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Contraseña incorrecta.';

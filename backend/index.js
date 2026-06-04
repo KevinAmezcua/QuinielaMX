@@ -81,8 +81,10 @@ const QuinielaSchema = new mongoose.Schema({
         visita:    { type: String, required: true },
         resultado: { type: String, enum: ['local', 'empate', 'visita'], required: true }
     }],
-    nombre:  { type: String },
-    jornada: { type: Number }
+    nombre:     { type: String },
+    celular:    { type: String },
+    estadoPago: { type: String, enum: ['pendiente', 'pagado'], default: 'pendiente' },
+    jornada:    { type: Number }
 });
 const Quiniela = mongoose.model('Quiniela', QuinielaSchema);
 
@@ -188,7 +190,7 @@ app.get('/getQuiniela', async (req, res) => {
 
 app.post('/newQuiniela', async (req, res) => {
     try {
-        const { nombre, partidos, jornada } = req.body;
+        const { nombre, celular, partidos, jornada } = req.body;
 
         const jornadaActual = await Jornada.findOne().sort({ numero: -1 });
         const expectedCount = jornadaActual ? jornadaActual.partidos.length : 9;
@@ -213,6 +215,7 @@ app.post('/newQuiniela', async (req, res) => {
 
         const newQuiniela = new Quiniela({
             nombre,
+            celular: celular || '',
             partidos,
             jornada: jornada || (jornadaActual ? jornadaActual.numero : null)
         });
@@ -221,6 +224,24 @@ app.post('/newQuiniela', async (req, res) => {
         return res.status(200).json({ message: "Quiniela creada con éxito." });
     } catch (error) {
         return res.status(500).json({ message: "Error al crear Quiniela.", error });
+    }
+});
+
+app.patch('/updatePago/:id', requireAdmin, async (req, res) => {
+    try {
+        const { estadoPago } = req.body;
+        if (!['pendiente', 'pagado'].includes(estadoPago)) {
+            return res.status(400).json({ message: "Estado inválido." });
+        }
+        const quiniela = await Quiniela.findByIdAndUpdate(
+            req.params.id,
+            { estadoPago },
+            { new: true }
+        );
+        if (!quiniela) return res.status(404).json({ message: "Quiniela no encontrada." });
+        return res.status(200).json({ ok: true, estadoPago: quiniela.estadoPago });
+    } catch (error) {
+        return res.status(500).json({ message: "Error al actualizar estado de pago.", error });
     }
 });
 

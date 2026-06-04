@@ -37,6 +37,70 @@
         </div>
     </div>
 
+    <!-- Sección de pago -->
+    <section class="container pago-container">
+        <p class="seccion-label"><i class="fa-solid fa-credit-card"></i> Inscripción y pago</p>
+        <div class="pago-card">
+
+            <!-- Proveedor + CLABE -->
+            <div class="pago-top">
+                <div class="pago-provider">
+                    <div class="pago-logo-wrap">
+                        <img src="./img/mercado-pago.jpg" alt="Mercado Pago" class="pago-logo">
+                    </div>
+                    <div class="pago-provider-info">
+                        <span class="pago-provider-name">Mercado Pago</span>
+                        <span class="pago-provider-sub">Transferencia SPEI</span>
+                    </div>
+                </div>
+                <div class="pago-clabe-chip">
+                    <span class="pago-clabe-label">CLABE</span>
+                    <span class="pago-clabe" id="pago-clabe-num">722969010951988347</span>
+                    <button class="pago-copy-btn" onclick="copiarCLABE()" id="pago-copy-btn" title="Copiar CLABE">
+                        <i class="fa-regular fa-copy" id="pago-copy-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pasos -->
+            <div class="pago-pasos">
+                <div class="pago-paso">
+                    <div class="pago-paso-icono">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                    <div class="pago-paso-body">
+                        <span class="pago-paso-etiqueta">Paso 1</span>
+                        <span class="pago-paso-titulo">Realiza la transferencia</span>
+                        <span class="pago-paso-desc">Envía el monto de inscripción a la CLABE indicada</span>
+                    </div>
+                </div>
+                <div class="pago-paso-flecha"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="pago-paso">
+                    <div class="pago-paso-icono">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div class="pago-paso-body">
+                        <span class="pago-paso-etiqueta">Paso 2</span>
+                        <span class="pago-paso-titulo">Espera confirmación</span>
+                        <span class="pago-paso-desc">Tu pago será confirmado por el administrador en breve</span>
+                    </div>
+                </div>
+                <div class="pago-paso-flecha"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="pago-paso">
+                    <div class="pago-paso-icono">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </div>
+                    <div class="pago-paso-body">
+                        <span class="pago-paso-etiqueta">Paso 3</span>
+                        <span class="pago-paso-titulo">Envía tu comprobante</span>
+                        <span class="pago-paso-desc">Manda la captura al <strong>311-268-24-06</strong></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
     <section class="container">
         <h1 id="jornada-titulo">Jornada</h1>
         <p class="seccion-label">Partidos de la jornada</p>
@@ -54,5 +118,20 @@
 
     <script src="./js/nav.js"></script>
     <script src="./js/renderInicio.js"></script>
+    <script>
+        function copiarCLABE() {
+            const clabe = document.getElementById('pago-clabe-num').textContent;
+            navigator.clipboard.writeText(clabe).then(() => {
+                const icon = document.getElementById('pago-copy-icon');
+                const btn  = document.getElementById('pago-copy-btn');
+                icon.className = 'fa-solid fa-check';
+                btn.style.color = 'var(--green)';
+                setTimeout(() => {
+                    icon.className = 'fa-regular fa-copy';
+                    btn.style.color = '';
+                }, 1800);
+            });
+        }
+    </script>
 </body>
 </html>

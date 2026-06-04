@@ -126,7 +126,7 @@ nav {
         gap: 0;
         background: #080b14;
         border-top: 2px solid var(--gold);
-        padding: 0.5rem 0 2rem;
+        padding: 0.25rem 0 1rem;
         display: none;
         overflow-y: auto;
         z-index: 1000;
@@ -137,12 +137,12 @@ nav {
     .nav-links a {
         display: flex;
         align-items: center;
-        padding: 1.2rem 2rem;
-        font-size: 1.7rem;
+        padding: 0.75rem 1.4rem;
+        font-size: 1.15rem;
         color: #ffffff;
         border-bottom: 1px solid rgba(255,255,255,0.12);
         border-left: 3px solid transparent;
-        letter-spacing: 2px;
+        letter-spacing: 1.5px;
     }
     .nav-links a:hover {
         background: rgba(234,179,8,0.08);
@@ -330,6 +330,191 @@ h1 {
     letter-spacing: 1px;
 }
 
+/* ── SECCIÓN PAGO ────────────────────────── */
+.pago-container {
+    margin-top: 2rem;
+    margin-bottom: 0;
+}
+
+.pago-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* ─ Top: proveedor + CLABE ─ */
+.pago-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.3rem 1.8rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    flex-wrap: wrap;
+}
+
+.pago-provider {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.pago-logo-wrap {
+    background: #fff;
+    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0.3rem;
+}
+
+.pago-logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.pago-provider-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+}
+
+.pago-provider-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.15rem;
+    color: var(--text);
+    letter-spacing: 1.5px;
+}
+
+.pago-provider-sub {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+}
+
+.pago-clabe-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: rgba(234,179,8,0.06);
+    border: 1px solid rgba(234,179,8,0.2);
+    border-radius: 10px;
+    padding: 0.6rem 0.95rem;
+}
+
+.pago-clabe-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.72rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    flex-shrink: 0;
+}
+
+.pago-clabe {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: var(--text);
+    letter-spacing: 1.5px;
+    user-select: all;
+}
+
+.pago-copy-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0.25rem 0.35rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+}
+.pago-copy-btn:hover { color: var(--gold); background: rgba(234,179,8,0.1); }
+
+/* ─ Pasos ─ */
+.pago-pasos {
+    display: flex;
+    align-items: center;
+    padding: 1.8rem;
+    gap: 0;
+}
+
+.pago-paso {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.85rem;
+    padding: 0 0.6rem;
+}
+
+.pago-paso-icono {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50%;
+    background: rgba(234,179,8,0.09);
+    border: 1.5px solid rgba(234,179,8,0.22);
+    color: var(--gold);
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+}
+.pago-paso:hover .pago-paso-icono {
+    background: rgba(234,179,8,0.16);
+    border-color: rgba(234,179,8,0.4);
+}
+
+.pago-paso-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: center;
+}
+
+.pago-paso-etiqueta {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 2.5px;
+    opacity: 0.65;
+}
+
+.pago-paso-titulo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    color: var(--text);
+    letter-spacing: 1px;
+}
+
+.pago-paso-desc {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 155px;
+}
+.pago-paso-desc strong { color: #e2e8f0; font-weight: 600; }
+
+.pago-paso-flecha {
+    color: rgba(234,179,8,0.25);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    padding: 0 0.2rem;
+    margin-bottom: 2rem;
+}
+
 /* ── RESPONSIVE ──────────────────────────── */
 @media (max-width: 900px) {
     .contenedor-partidos { grid-template-columns: repeat(2, 1fr); }
@@ -342,4 +527,36 @@ h1 {
     .hero-content { bottom: 1.8rem; }
     .hero-badge { font-size: 0.78rem; }
     .hero-sub   { font-size: 0.88rem; }
+
+    .pago-top {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.1rem;
+        gap: 0.85rem;
+    }
+    .pago-clabe-chip { width: 100%; justify-content: space-between; }
+    .pago-clabe      { font-size: 0.85rem; letter-spacing: 0.8px; }
+
+    .pago-pasos {
+        flex-direction: column;
+        padding: 1.2rem 1.1rem;
+        align-items: stretch;
+        gap: 0;
+    }
+    .pago-paso {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-start;
+        padding: 0.85rem 0;
+        gap: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .pago-paso:last-child { border-bottom: none; }
+    .pago-paso-body  { align-items: flex-start; }
+    .pago-paso-flecha {
+        align-self: center;
+        transform: rotate(90deg);
+        margin: 0;
+        padding: 0.3rem 0;
+    }
 }

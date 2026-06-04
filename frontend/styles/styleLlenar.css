@@ -210,11 +210,43 @@
     display: block;
 }
 
-.form-footer input[type="text"]:focus {
+.form-footer input[type="text"]:focus,
+.form-footer input[type="tel"]:focus {
     border-color: var(--gold);
 }
 
-.form-footer input[type="text"]::placeholder { color: var(--muted); }
+.form-footer input[type="text"]::placeholder,
+.form-footer input[type="tel"]::placeholder { color: var(--muted); }
+
+.form-footer input[type="tel"] {
+    width: 100%;
+    padding: 0.8rem 1.1rem;
+    font-size: 1.05rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0.5px;
+    outline: none;
+    transition: border-color 0.2s;
+    display: block;
+}
+
+.aviso-celular {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.aviso-celular i {
+    color: var(--gold);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
 
 .form-footer button {
     width: 100%;

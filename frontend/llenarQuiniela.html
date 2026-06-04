@@ -60,6 +60,11 @@
         <!-- Footer sticky con nombre y enviar -->
         <div class="form-footer">
             <input type="text" id="nombre" placeholder="Tu nombre" autocomplete="off" required>
+            <input type="tel" id="celular" placeholder="Tu número de celular" autocomplete="tel" required>
+            <p class="aviso-celular">
+                <i class="fa-solid fa-circle-info"></i>
+                Este número será usado para contactar al posible ganador.
+            </p>
             <button id="btn-enviar" onclick="enviarQuiniela()">
                 <i class="fa-solid fa-paper-plane"></i> Enviar Quiniela
             </button>

@@ -32,7 +32,7 @@
         <h1>Panel de Administración</h1>
 
         <!-- Contraseña -->
-        <div class="admin-card">
+        <div class="admin-card" id="card-password">
             <h2><i class="fa-solid fa-lock"></i> Contraseña</h2>
             <div class="password-row">
                 <input type="password" id="admin-password" placeholder="Contraseña de administrador"
@@ -46,111 +46,128 @@
             </p>
         </div>
 
-        <!-- Configurar Jornada -->
-        <div class="admin-card" id="card-jornada" style="display:none">
-            <h2 class="card-toggle" onclick="toggleAdminCard(this)">
-                <span><i class="fa-solid fa-calendar-days"></i> Configurar Partidos de la Jornada</span>
-                <i class="fa-solid fa-chevron-down card-chevron"></i>
-            </h2>
-            <div class="card-body">
-                <div class="jornada-numero-row">
-                    <label for="jornada-numero">Número de Jornada:</label>
-                    <input type="number" id="jornada-numero" min="1" max="64" placeholder="Ej: 1">
-                </div>
-                <div id="partidos-admin"></div>
-                <div class="admin-buttons">
-                    <button class="btn-add" onclick="agregarPartido()">
-                        <i class="fa-solid fa-plus"></i> Agregar partido
-                    </button>
-                    <button class="btn-remove" onclick="limpiarPartidos()">
-                        <i class="fa-solid fa-broom"></i> Limpiar todos
-                    </button>
-                    <button class="btn-primary" onclick="guardarJornada()">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Jornada
-                    </button>
-                </div>
-                <div class="archivar-banner">
-                    <i class="fa-solid fa-box-archive archivar-banner-icon"></i>
-                    <div class="archivar-banner-content">
-                        <span class="archivar-banner-titulo">Archivar Jornada</span>
-                        <span class="archivar-banner-desc">Mueve esta jornada al historial y deja el panel listo para la siguiente. Los datos no se pierden.</span>
-                    </div>
-                    <button class="btn-archive" onclick="archivarJornada()">
-                        <i class="fa-solid fa-box-archive"></i> Archivar
-                    </button>
-                </div>
+        <!-- Tab navigation -->
+        <div class="admin-tab-bar" id="admin-tab-bar" style="display:none">
+            <button class="admin-tab-btn" data-tab="jornada" onclick="switchTab('jornada')">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Jornada</span>
+            </button>
+            <button class="admin-tab-btn" data-tab="resultados" onclick="switchTab('resultados')">
+                <i class="fa-solid fa-check-double"></i>
+                <span>Resultados</span>
+            </button>
+            <button class="admin-tab-btn" data-tab="participantes" onclick="switchTab('participantes')">
+                <i class="fa-solid fa-users"></i>
+                <span>Participantes</span>
+            </button>
+            <button class="admin-tab-btn" data-tab="eliminar" onclick="switchTab('eliminar')">
+                <i class="fa-solid fa-trash"></i>
+                <span>Eliminar</span>
+            </button>
+            <button class="admin-tab-btn" data-tab="historial" onclick="switchTab('historial')">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Historial</span>
+            </button>
+        </div>
 
-                <!-- Toggle envíos -->
-                <div class="envios-banner envios-banner--abierto" id="envios-banner" style="display:none">
-                    <i class="fa-solid fa-paper-plane envios-banner-icon" id="envios-icon"></i>
-                    <div class="archivar-banner-content">
-                        <span class="archivar-banner-titulo" id="envios-titulo">Envíos abiertos</span>
-                        <span class="archivar-banner-desc" id="envios-desc">Los participantes pueden enviar su quiniela.</span>
-                    </div>
-                    <button class="btn-toggle-envios btn-cerrar-envios" id="btn-toggle-envios" onclick="toggleEnvios()">
-                        <i class="fa-solid fa-lock"></i> Cerrar Envíos
-                    </button>
+        <!-- Configurar Jornada -->
+        <div class="admin-card admin-section" id="card-jornada" style="display:none">
+            <h2><i class="fa-solid fa-calendar-days"></i> Configurar Partidos de la Jornada</h2>
+            <div class="jornada-numero-row">
+                <label for="jornada-numero">Número de Jornada:</label>
+                <input type="number" id="jornada-numero" min="1" max="64" placeholder="Ej: 1">
+            </div>
+            <div id="partidos-admin"></div>
+            <div class="admin-buttons">
+                <button class="btn-add" onclick="agregarPartido()">
+                    <i class="fa-solid fa-plus"></i> Agregar partido
+                </button>
+                <button class="btn-remove" onclick="limpiarPartidos()">
+                    <i class="fa-solid fa-broom"></i> Limpiar todos
+                </button>
+                <button class="btn-primary" onclick="guardarJornada()">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Jornada
+                </button>
+            </div>
+            <div class="archivar-banner">
+                <i class="fa-solid fa-box-archive archivar-banner-icon"></i>
+                <div class="archivar-banner-content">
+                    <span class="archivar-banner-titulo">Archivar Jornada</span>
+                    <span class="archivar-banner-desc">Mueve esta jornada al historial y deja el panel listo para la siguiente. Los datos no se pierden.</span>
                 </div>
+                <button class="btn-archive" onclick="archivarJornada()">
+                    <i class="fa-solid fa-box-archive"></i> Archivar
+                </button>
+            </div>
+
+            <!-- Toggle envíos -->
+            <div class="envios-banner envios-banner--abierto" id="envios-banner" style="display:none">
+                <i class="fa-solid fa-paper-plane envios-banner-icon" id="envios-icon"></i>
+                <div class="archivar-banner-content">
+                    <span class="archivar-banner-titulo" id="envios-titulo">Envíos abiertos</span>
+                    <span class="archivar-banner-desc" id="envios-desc">Los participantes pueden enviar su quiniela.</span>
+                </div>
+                <button class="btn-toggle-envios btn-cerrar-envios" id="btn-toggle-envios" onclick="toggleEnvios()">
+                    <i class="fa-solid fa-lock"></i> Cerrar Envíos
+                </button>
             </div>
         </div>
 
         <!-- Actualizar Resultados -->
-        <div class="admin-card" id="card-resultados" style="display:none">
-            <h2 class="card-toggle" onclick="toggleAdminCard(this)">
-                <span><i class="fa-solid fa-check-double"></i> Actualizar Resultados Oficiales</span>
-                <i class="fa-solid fa-chevron-down card-chevron"></i>
-            </h2>
-            <div class="card-body">
-                <p id="jornada-actual-info">Cargando jornada actual...</p>
-                <div id="resultados-admin"></div>
-                <div class="admin-buttons" style="margin-top:1rem">
-                    <button class="btn-primary" onclick="guardarResultados()">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Resultados
-                    </button>
-                </div>
+        <div class="admin-card admin-section" id="card-resultados" style="display:none">
+            <h2><i class="fa-solid fa-check-double"></i> Actualizar Resultados Oficiales</h2>
+            <p id="jornada-actual-info">Cargando jornada actual...</p>
+            <div id="resultados-admin"></div>
+            <div class="admin-buttons" style="margin-top:1rem">
+                <button class="btn-primary" onclick="guardarResultados()">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Resultados
+                </button>
+            </div>
+        </div>
+
+        <!-- Participantes -->
+        <div class="admin-card admin-section" id="card-participantes" style="display:none">
+            <div class="participantes-header">
+                <h2><i class="fa-solid fa-users"></i> Participantes</h2>
+                <button class="btn-refresh" onclick="cargarParticipantes()">
+                    <i class="fa-solid fa-rotate-right"></i> Actualizar
+                </button>
+            </div>
+            <div id="participantes-admin-list">
+                <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
             </div>
         </div>
 
         <!-- Eliminar Quinielas -->
-        <div class="admin-card" id="card-eliminar" style="display:none">
-            <h2 class="card-toggle" onclick="toggleAdminCard(this)">
-                <span><i class="fa-solid fa-trash"></i> Eliminar Quinielas</span>
-                <i class="fa-solid fa-chevron-down card-chevron"></i>
-            </h2>
-            <div class="card-body">
-                <div class="eliminar-aviso-info">
-                    <i class="fa-solid fa-circle-info"></i>
-                    <div class="eliminar-aviso-texto">
-                        <span>Solo para corregir errores individuales.</span>
-                        <span class="eliminar-aviso-guia">
-                            <span><i class="fa-solid fa-box-archive"></i> Cerrar jornada → <strong>Archivar Jornada</strong></span>
-                            <span><i class="fa-solid fa-clock-rotate-left"></i> Borrar permanente → <strong>Historial</strong></span>
-                        </span>
-                    </div>
+        <div class="admin-card admin-section" id="card-eliminar" style="display:none">
+            <h2><i class="fa-solid fa-trash"></i> Eliminar Quinielas</h2>
+            <div class="eliminar-aviso-info">
+                <i class="fa-solid fa-circle-info"></i>
+                <div class="eliminar-aviso-texto">
+                    <span>Solo para corregir errores individuales.</span>
+                    <span class="eliminar-aviso-guia">
+                        <span><i class="fa-solid fa-box-archive"></i> Cerrar jornada → <strong>Archivar Jornada</strong></span>
+                        <span><i class="fa-solid fa-clock-rotate-left"></i> Borrar permanente → <strong>Historial</strong></span>
+                    </span>
                 </div>
-                <div id="quinielas-admin-list">
-                    <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
-                </div>
+            </div>
+            <div id="quinielas-admin-list">
+                <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
             </div>
         </div>
 
         <!-- Historial -->
-        <div class="admin-card" id="card-historial" style="display:none">
-            <h2 class="card-toggle" onclick="toggleAdminCard(this)">
-                <span><i class="fa-solid fa-clock-rotate-left"></i> Historial</span>
-                <i class="fa-solid fa-chevron-down card-chevron"></i>
-            </h2>
-            <div class="card-body">
-                <div class="borrar-todas-wrapper">
-                    <button class="btn-danger-full" onclick="limpiarHistorial()">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        Limpiar Historial
-                    </button>
-                    <p class="borrar-todas-aviso">
-                        <i class="fa-solid fa-circle-info"></i>
-                        Elimina permanentemente todas las jornadas archivadas y sus quinielas.
-                    </p>
-                </div>
+        <div class="admin-card admin-section" id="card-historial" style="display:none">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Historial</h2>
+            <div class="borrar-todas-wrapper">
+                <button class="btn-danger-full" onclick="limpiarHistorial()">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Limpiar Historial
+                </button>
+                <p class="borrar-todas-aviso">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Elimina permanentemente todas las jornadas archivadas y sus quinielas.
+                </p>
             </div>
         </div>
     </section>
