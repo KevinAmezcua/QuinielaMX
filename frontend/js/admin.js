@@ -610,8 +610,10 @@ async function verificarAdmin() {
             cargarQuinielasAdmin();
             cargarParticipantes();
         } else {
+            const data = await res.json().catch(() => ({}));
+            const msg = data.message || 'Contraseña incorrecta.';
             errorEl.style.display = 'block';
-            errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Contraseña incorrecta.';
+            errorEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Continuar';
             document.getElementById('admin-password').focus();
