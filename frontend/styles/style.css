@@ -507,6 +507,87 @@ h1 {
 }
 .pago-paso-desc strong { color: #e2e8f0; font-weight: 600; }
 
+.pago-costo-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.35rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    background: rgba(234,179,8,0.1);
+    border: 1px solid rgba(234,179,8,0.25);
+    border-radius: 8px;
+    padding: 0.3rem 0.85rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.pago-aviso-cuenta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.8rem;
+    border-top: 1px solid var(--border);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.78rem;
+    color: var(--muted);
+    background: rgba(255,255,255,0.015);
+    letter-spacing: 0.2px;
+}
+.pago-aviso-cuenta i { color: var(--gold); font-size: 0.8rem; flex-shrink: 0; }
+
+/* ── RECORDATORIO PAGO (resultados) ──────── */
+.pago-recordatorio {
+    max-width: 860px;
+    margin: 1.2rem auto 0;
+    padding: 0 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.pago-recordatorio-contenido {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: rgba(234,179,8,0.06);
+    border: 1px solid rgba(234,179,8,0.2);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    flex: 1;
+}
+
+.pago-recordatorio-icono {
+    color: var(--gold);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.pago-recordatorio-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+.pago-recordatorio-texto strong { color: var(--text); }
+.pago-recordatorio-texto span   { color: var(--muted); }
+
+.pago-recordatorio-cerrar {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.35rem;
+    border-radius: 5px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+    margin-top: 0.05rem;
+}
+.pago-recordatorio-cerrar:hover { color: var(--text); }
+
 .pago-paso-flecha {
     color: rgba(234,179,8,0.25);
     font-size: 0.8rem;

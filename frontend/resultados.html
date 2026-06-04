@@ -28,6 +28,20 @@
         </nav>
     </header>
 
+    <!-- Banner recordatorio de pago -->
+    <div class="pago-recordatorio" id="pago-recordatorio">
+        <div class="pago-recordatorio-contenido">
+            <i class="fa-solid fa-triangle-exclamation pago-recordatorio-icono"></i>
+            <div class="pago-recordatorio-texto">
+                <strong>¿Ya pagaste tu quiniela?</strong>
+                <span>Tu participación solo cuenta si tu pago fue confirmado. Envía tu comprobante al <strong>311-268-24-06</strong>.</span>
+            </div>
+        </div>
+        <button class="pago-recordatorio-cerrar" onclick="cerrarRecordatorio()" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
     <section class="contenedor-tabla">
         <h1>Jornada</h1>
 
@@ -61,5 +75,17 @@
 
     <script src="./js/nav.js"></script>
     <script src="./js/obtenerQuinielasTabla.js"></script>
+    <script>
+        if (localStorage.getItem('pagoConfirmado') === '1') {
+            document.getElementById('pago-recordatorio').style.display = 'none';
+        }
+        function cerrarRecordatorio() {
+            localStorage.setItem('pagoConfirmado', '1');
+            const el = document.getElementById('pago-recordatorio');
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-8px)';
+            setTimeout(() => el.style.display = 'none', 250);
+        }
+    </script>
 </body>
 </html>
