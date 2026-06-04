@@ -1,5 +1,3 @@
-const apiURL = 'https://quinielamx.onrender.com';
-
 function formatFecha(fecha) {
     if (!fecha || !fecha.includes('-')) return fecha;
     const [y, m, d] = fecha.split('-');
@@ -18,7 +16,7 @@ async function renderPartidosInicio() {
     const contenedor = document.getElementById('contenedor-partidos');
 
     try {
-        const res = await fetch(`${apiURL}/getJornada`);
+        const res = await fetchWithRetry(`${apiURL}/getJornada`);
         const data = await res.json();
 
         if (!data.jornada) {

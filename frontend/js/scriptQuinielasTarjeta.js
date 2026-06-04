@@ -1,8 +1,6 @@
-const apiURL = 'https://quinielamx.onrender.com';
-
 async function obtenerQuinielaTarjeta() {
     try {
-        const res = await fetch(`${apiURL}/getQuiniela`);
+        const res = await fetchWithRetry(`${apiURL}/getQuiniela`);
         const data = await res.json();
 
         const quinielaDiv = document.getElementById('obtenerTodas-quinielas');
@@ -35,7 +33,7 @@ async function eliminarQuiniela(id, nombre) {
     if (!confirm(`¿Deseas eliminar la quiniela de "${nombre}"?`)) return;
 
     try {
-        const res = await fetch(`${apiURL}/deleteQuiniela/${id}`, {
+        const res = await fetchWithRetry(`${apiURL}/deleteQuiniela/${id}`, {
             method: 'DELETE'
         });
 

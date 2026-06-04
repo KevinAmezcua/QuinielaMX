@@ -1,5 +1,3 @@
-const apiURL = 'https://quinielamx.onrender.com';
-
 let _jornadaActualNum = null;
 
 function adminHeaders() {
@@ -156,7 +154,7 @@ async function archivarJornada() {
     if (!confirm(`¿Archivar la Jornada ${numero}?\n\nLos partidos y quinielas quedarán guardados en el historial pero ya no serán la jornada activa.`)) return;
 
     try {
-        const res = await fetch(`${apiURL}/archivarJornada`, {
+        const res = await fetchWithRetry(`${apiURL}/archivarJornada`, {
             method: 'PUT',
             headers: adminHeaders(),
             body: JSON.stringify({ numero })
@@ -230,7 +228,7 @@ async function guardarJornada() {
     }
 
     try {
-        const res = await fetch(`${apiURL}/setJornada`, {
+        const res = await fetchWithRetry(`${apiURL}/setJornada`, {
             method: 'PUT',
             headers: adminHeaders(),
             body: JSON.stringify({ numero, partidos })
@@ -252,7 +250,7 @@ async function guardarResultados() {
     const resultados = Array.from(selects).map(s => s.value);
 
     try {
-        const res = await fetch(`${apiURL}/setResultados`, {
+        const res = await fetchWithRetry(`${apiURL}/setResultados`, {
             method: 'PUT',
             headers: adminHeaders(),
             body: JSON.stringify({ numero, resultados })
@@ -296,7 +294,7 @@ async function toggleEnvios() {
     if (!numero) { alert("No hay jornada activa."); return; }
 
     try {
-        const res = await fetch(`${apiURL}/toggleEnvios`, {
+        const res = await fetchWithRetry(`${apiURL}/toggleEnvios`, {
             method: 'PUT',
             headers: adminHeaders(),
             body: JSON.stringify({ numero })
@@ -317,7 +315,7 @@ async function cargarJornadaActual() {
     const contenedorResultados = document.getElementById('resultados-admin');
 
     try {
-        const res = await fetch(`${apiURL}/getJornada`);
+        const res = await fetchWithRetry(`${apiURL}/getJornada`);
         const data = await res.json();
 
         if (!data.jornada) {
@@ -375,7 +373,7 @@ async function cargarQuinielasAdmin() {
     lista.innerHTML = '<p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
 
     try {
-        const res = await fetch(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
+        const res = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
         const data = await res.json();
         const quinielas = data.quinielas;
 
@@ -425,7 +423,7 @@ async function eliminarQuinielaAdmin(id, nombre) {
     if (!confirm(`¿Eliminar la quiniela de "${nombre}"?`)) return;
 
     try {
-        const res = await fetch(`${apiURL}/deleteQuiniela/${id}`, { method: 'DELETE', headers: adminHeaders() });
+        const res = await fetchWithRetry(`${apiURL}/deleteQuiniela/${id}`, { method: 'DELETE', headers: adminHeaders() });
         const data = await res.json();
 
         if (res.ok) {
@@ -449,7 +447,7 @@ async function limpiarHistorial() {
     if (!confirm('Confirma de nuevo: ¿eliminar el historial completo? Esta acción no se puede deshacer.')) return;
 
     try {
-        const res = await fetch(`${apiURL}/deleteHistorial`, {
+        const res = await fetchWithRetry(`${apiURL}/deleteHistorial`, {
             method: 'DELETE',
             headers: adminHeaders()
         });
@@ -468,7 +466,7 @@ async function limpiarHistorial() {
 async function actualizarPago(id, estado, selectEl) {
     selectEl.disabled = true;
     try {
-        const res = await fetch(`${apiURL}/updatePago/${id}`, {
+        const res = await fetchWithRetry(`${apiURL}/updatePago/${id}`, {
             method: 'PATCH',
             headers: adminHeaders(),
             body: JSON.stringify({ estadoPago: estado })
@@ -512,7 +510,7 @@ async function cargarParticipantes() {
     lista.innerHTML = '<p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
 
     try {
-        const res = await fetch(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
+        const res = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
         const data = await res.json();
         const quinielas = data.quinielas;
 
@@ -591,7 +589,7 @@ async function verificarAdmin() {
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
     try {
-        const res = await fetch(`${apiURL}/verifyAdmin`, {
+        const res = await fetchWithRetry(`${apiURL}/verifyAdmin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password })

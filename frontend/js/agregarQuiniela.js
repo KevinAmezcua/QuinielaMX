@@ -1,5 +1,3 @@
-const apiURL = 'https://quinielamx.onrender.com';
-
 async function enviarQuiniela() {
     const nombre = document.getElementById('nombre').value.trim();
     const celular = document.getElementById('celular').value.trim();
@@ -38,7 +36,7 @@ async function enviarQuiniela() {
     if (!confirm(`¿Deseas enviar tu quiniela como "${nombre}"?`)) return;
 
     try {
-        const res = await fetch(`${apiURL}/newQuiniela`, {
+        const res = await fetchWithRetry(`${apiURL}/newQuiniela`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre, celular, partidos, jornada: jornadaNum })

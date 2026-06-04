@@ -1,5 +1,3 @@
-const apiURL = 'https://quinielamx.onrender.com';
-
 let _jornada    = null;
 let _quinielas  = [];
 let _todasJornadas = [];
@@ -7,7 +5,7 @@ let _todasJornadas = [];
 async function obtenerQuinielasTabla() {
     try {
         // 1. Jornada actual
-        const jornadaRes  = await fetch(`${apiURL}/getJornada`);
+        const jornadaRes  = await fetchWithRetry(`${apiURL}/getJornada`);
         const jornadaData = await jornadaRes.json();
         _jornada = jornadaData.jornada;
 
@@ -21,7 +19,7 @@ async function obtenerQuinielasTabla() {
             document.querySelector('h1').textContent = `Jornada ${_jornada.numero}`;
 
             // 2. Quinielas de esta jornada
-            const quinRes  = await fetch(`${apiURL}/getQuiniela?jornada=${_jornada.numero}`);
+            const quinRes  = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${_jornada.numero}`);
             const quinData = await quinRes.json();
             _quinielas = quinData.quinielas;
 
@@ -162,7 +160,7 @@ async function cargarHistorial(jornadaActualNum) {
     const container = document.getElementById('historial-container');
 
     try {
-        const res  = await fetch(`${apiURL}/getAllJornadas`);
+        const res  = await fetchWithRetry(`${apiURL}/getAllJornadas`);
         const data = await res.json();
         _todasJornadas = data.jornadas;
 
@@ -223,7 +221,7 @@ async function renderHistorialJornada(body, jornadaNum) {
     }
 
     try {
-        const res  = await fetch(`${apiURL}/getQuiniela?jornada=${jornadaNum}`);
+        const res  = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${jornadaNum}`);
         const data = await res.json();
         const quinielas = data.quinielas;
 

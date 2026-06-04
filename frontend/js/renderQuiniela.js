@@ -8,7 +8,7 @@ async function renderFormPartidos() {
     const contenedor = document.getElementById('partidos-form');
 
     try {
-        const res  = await fetch(`${apiURL}/getJornada`);
+        const res  = await fetchWithRetry(`${apiURL}/getJornada`);
         const data = await res.json();
 
         if (!data.jornada) {
