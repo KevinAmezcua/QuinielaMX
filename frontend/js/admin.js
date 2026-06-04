@@ -404,7 +404,7 @@ async function eliminarQuinielaAdmin(id, nombre) {
     if (!confirm(`¿Eliminar la quiniela de "${nombre}"?`)) return;
 
     try {
-        const res = await fetch(`${apiURL}/deleteQuiniela/${id}`, { method: 'DELETE' });
+        const res = await fetch(`${apiURL}/deleteQuiniela/${id}`, { method: 'DELETE', headers: adminHeaders() });
         const data = await res.json();
 
         if (res.ok) {
@@ -454,6 +454,8 @@ async function actualizarPago(id, estado, selectEl) {
         });
         if (res.ok) {
             selectEl.className = `pago-estado-select pago-estado--${estado}`;
+            const icono = selectEl.nextElementSibling;
+            if (icono) icono.style.color = '';
             actualizarResumenPagos();
         } else {
             alert("Error al actualizar el estado de pago.");
@@ -526,7 +528,7 @@ async function cargarParticipantes() {
             const row = document.createElement('div');
             row.className = 'participante-row';
             const celularHTML = q.celular
-                ? `<a href="tel:${q.celular}" class="celular-link"><i class="fa-solid fa-phone"></i> ${q.celular}</a>`
+                ? `<span class="celular-texto"><i class="fa-solid fa-phone"></i> ${q.celular}</span>`
                 : `<span class="sin-celular">—</span>`;
             const estado = q.estadoPago || 'pendiente';
             row.innerHTML = `
@@ -534,11 +536,14 @@ async function cargarParticipantes() {
                 <span class="participante-nombre">${q.nombre || '—'}</span>
                 <span class="participante-celular">${celularHTML}</span>
                 <span class="participante-pago">
-                    <select class="pago-estado-select pago-estado--${estado}"
-                            onchange="actualizarPago('${q._id}', this.value, this)">
-                        <option value="pendiente" ${estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-                        <option value="pagado"    ${estado === 'pagado'    ? 'selected' : ''}>Pagado</option>
-                    </select>
+                    <span class="pago-select-wrap">
+                        <select class="pago-estado-select pago-estado--${estado}"
+                                onchange="actualizarPago('${q._id}', this.value, this)">
+                            <option value="pendiente" ${estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="pagado"    ${estado === 'pagado'    ? 'selected' : ''}>Pagado</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down pago-select-icono"></i>
+                    </span>
                 </span>`;
             tabla.appendChild(row);
         });
