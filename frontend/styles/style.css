@@ -151,8 +151,8 @@ nav {
     }
     .nav-links a.active {
         color: var(--gold);
-        background: rgba(234,179,8,0.10);
-        border-left-color: var(--gold);
+        background: rgba(234,179,8,0.05);
+        border-left-color: rgba(234,179,8,0.5);
     }
 }
 
