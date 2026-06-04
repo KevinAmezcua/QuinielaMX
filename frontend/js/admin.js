@@ -356,6 +356,7 @@ async function cargarJornadaActual() {
         const contenedorPartidos = document.getElementById('partidos-admin');
         contenedorPartidos.innerHTML = '';
         partidos.forEach(p => agregarPartido(p.localImg, p.visitaImg, p.fecha, p.hora));
+        actualizarOpcionesDisponibles();
 
     } catch {
         info.textContent = 'Error al cargar la jornada.';
