@@ -77,10 +77,30 @@ const EQUIPOS = [
     { nombre: 'Uzbekistán',      img: 'mundial/uzbekistan.png' },
 ];
 
-function equipoOptions(selected = '') {
-    return EQUIPOS.map(e =>
-        `<option value="${e.img}" data-nombre="${e.nombre}" ${selected === e.img ? 'selected' : ''}>${e.nombre}</option>`
-    ).join('');
+function getEquiposUsados() {
+    const usados = new Set();
+    document.querySelectorAll('.local-select, .visita-select').forEach(sel => {
+        if (sel.value) usados.add(sel.value);
+    });
+    return usados;
+}
+
+function equipoOptions(selected = '', excluir = new Set()) {
+    return EQUIPOS
+        .filter(e => !excluir.has(e.img))
+        .map(e =>
+            `<option value="${e.img}" data-nombre="${e.nombre}" ${selected === e.img ? 'selected' : ''}>${e.nombre}</option>`
+        ).join('');
+}
+
+function actualizarOpcionesDisponibles() {
+    const usados = getEquiposUsados();
+    document.querySelectorAll('.local-select, .visita-select').forEach(sel => {
+        const seleccionado = sel.value;
+        const excluir = new Set(usados);
+        excluir.delete(seleccionado);
+        sel.innerHTML = '<option value="">-- Equipo --</option>' + equipoOptions(seleccionado, excluir);
+    });
 }
 
 function agregarPartido(localImg = '', visitaImg = '', fecha = '', hora = '') {
@@ -117,7 +137,7 @@ function agregarPartido(localImg = '', visitaImg = '', fecha = '', hora = '') {
                  alt=""
                  style="${visitaImg ? '' : 'visibility:hidden'}">
         </div>
-        <button class="btn-remove" onclick="this.closest('.partido-admin').remove(); renumerarPartidos()">
+        <button class="btn-remove" onclick="this.closest('.partido-admin').remove(); renumerarPartidos(); actualizarOpcionesDisponibles()">
             <i class="fa-solid fa-trash"></i>
         </button>`;
     contenedor.appendChild(div);
@@ -176,6 +196,7 @@ function previewTeam(select, imgId) {
     } else {
         img.style.visibility = 'hidden';
     }
+    actualizarOpcionesDisponibles();
 }
 
 async function guardarJornada() {
