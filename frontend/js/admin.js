@@ -108,6 +108,7 @@ function agregarPartido(localImg = '', visitaImg = '', fecha = '', hora = '') {
             <i class="fa-solid fa-trash"></i>
         </button>`;
     contenedor.appendChild(div);
+    actualizarOpcionesDisponibles();
 }
 
 function limpiarPartidos() {
