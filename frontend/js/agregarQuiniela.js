@@ -1,6 +1,5 @@
 async function enviarQuiniela() {
     const nombre = document.getElementById('nombre').value.trim();
-    const celular = document.getElementById('celular').value.trim();
     const contenedor = document.getElementById('partidos-form');
     const jornadaNum = parseInt(contenedor?.dataset.jornada) || null;
     const partidosDOM = contenedor.querySelectorAll('.partido');
@@ -24,10 +23,6 @@ async function enviarQuiniela() {
         alert("Por favor ingresa tu nombre.");
         return;
     }
-    if (!celular) {
-        alert("Por favor ingresa tu número de celular.");
-        return;
-    }
     if (partidos.length !== partidosDOM.length) {
         alert("Debes seleccionar un resultado para todos los partidos.");
         return;
@@ -39,7 +34,7 @@ async function enviarQuiniela() {
         const res = await fetchWithRetry(`${apiURL}/newQuiniela`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, celular, partidos, jornada: jornadaNum })
+            body: JSON.stringify({ nombre, partidos, jornada: jornadaNum })
         });
 
         const data = await res.json();
