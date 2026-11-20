@@ -8,7 +8,6 @@ const EQUIPOS = [
     { nombre: 'Cruz Azul',          img: 'cruz_azul.png' },
     { nombre: 'FC Juárez',          img: 'juarez.png' },
     { nombre: 'León',               img: 'leon.png' },
-    { nombre: 'Mazatlán',           img: 'mazatlan.png' },
     { nombre: 'Monterrey',          img: 'mty.png' },
     { nombre: 'Necaxa',             img: 'necaxa.png' },
     { nombre: 'Pachuca',            img: 'pachuca.png' },
