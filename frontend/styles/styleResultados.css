@@ -370,3 +370,87 @@ tbody tr:nth-child(even):hover td.col-sticky-right {
     .card-nombre { font-size: 0.95rem; }
     .contenedor-tabla { padding: 0 0.5rem 2rem; }
 }
+
+/* ── TU QUINIELA / COMPARTIR ─────────────── */
+.quiniela-card--yo {
+    border-color: rgba(34, 197, 94, 0.55);
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.25);
+}
+.badge-yo {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--green);
+    font-size: 0.72rem;
+    vertical-align: middle;
+}
+.fila-yo td,
+.general-row.fila-yo { background: rgba(34, 197, 94, 0.08); }
+
+.compartir-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.92rem;
+}
+.compartir-bar > span i { color: var(--green); margin-right: 0.3rem; }
+.btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    background: #25d366;
+    color: #052e16;
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.btn-whatsapp:hover { filter: brightness(1.08); }
+
+/* ── TABLA GENERAL ───────────────────────── */
+.general-tabla {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.general-row {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr 5rem 3.5rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 1rem;
+}
+.general-row:first-child { border-top: none; }
+.general-row--header {
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+.general-row > span:nth-child(3),
+.general-row > span:nth-child(4) { text-align: right; }
+.general-nombre {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.general-pts { color: var(--gold); font-size: 1.2rem; }
+
+@media (max-width: 480px) {
+    .general-row { grid-template-columns: 2rem 1fr 3.5rem 3rem; padding: 0.55rem 0.75rem; }
+    .btn-whatsapp { width: 100%; justify-content: center; }
+}

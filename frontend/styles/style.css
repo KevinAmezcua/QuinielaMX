@@ -642,3 +642,119 @@ h1 {
         padding: 0.3rem 0;
     }
 }
+
+/* ── TOASTS ──────────────────────────────── */
+.toast-container {
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: min(92vw, 420px);
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px var(--shadow);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: auto;
+}
+.toast.visible { opacity: 1; transform: translateY(0); }
+.toast i { margin-top: 0.15rem; }
+.toast--exito { border-left: 4px solid var(--green); }
+.toast--exito i { color: var(--green); }
+.toast--error { border-left: 4px solid #f87171; }
+.toast--error i { color: #f87171; }
+.toast--info  { border-left: 4px solid #60a5fa; }
+.toast--info i  { color: #60a5fa; }
+
+/* ── MODAL DE CONFIRMACIÓN ───────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal {
+    width: min(100%, 400px);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.4rem;
+    box-shadow: 0 16px 40px var(--shadow);
+}
+.modal h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
+.modal-mensaje {
+    margin: 0 0 1.25rem;
+    color: #cbd5e1;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    white-space: pre-line;
+}
+.modal-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+}
+.modal-btn {
+    font-family: inherit;
+    font-size: 1.05rem;
+    letter-spacing: 0.5px;
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+}
+.modal-btn--cancelar { background: transparent; color: var(--text); }
+.modal-btn--cancelar:hover { background: var(--bg-hover); }
+.modal-btn--aceptar { background: var(--green); color: #052e16; border-color: transparent; }
+.modal-btn--peligro { background: #dc2626; color: #fff; border-color: transparent; }
+.modal-btn:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+
+/* ── AVISO DE ARRANQUE DEL SERVIDOR ──────── */
+.aviso-arranque {
+    position: fixed;
+    top: calc(var(--nav-h) + 0.5rem);
+    left: 50%;
+    transform: translate(-50%, -8px);
+    z-index: 999;
+    width: min(92vw, 460px);
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    background: rgba(234, 179, 8, 0.12);
+    border: 1px solid rgba(234, 179, 8, 0.35);
+    color: #fde68a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.88rem;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+}
+.aviso-arranque.visible { opacity: 1; transform: translate(-50%, 0); }

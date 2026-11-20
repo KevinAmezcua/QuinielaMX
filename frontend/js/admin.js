@@ -5,6 +5,18 @@ function adminHeaders() {
     return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 }
 
+// Petición autenticada. Si la sesión expiró, avisa y vuelve a pedir contraseña.
+async function apiAdmin(ruta, opciones = {}) {
+    const res = await fetchWithRetry(`${apiURL}${ruta}`, { ...opciones, headers: adminHeaders() });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) {
+        sessionStorage.removeItem('adminToken');
+        toast(data.message || 'Sesión expirada. Vuelve a iniciar sesión.', 'error', 5000);
+        setTimeout(() => window.location.reload(), 1500);
+    }
+    return { res, data };
+}
+
 function switchTab(name) {
     document.querySelectorAll('.admin-tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === name);
@@ -23,26 +35,7 @@ function switchTab(name) {
     if (el) el.style.display = 'block';
 }
 
-const EQUIPOS = [
-    { nombre: 'América',           img: 'america.png' },
-    { nombre: 'Atlante',           img: 'atlante.png' },
-    { nombre: 'Atlas',             img: 'atlas.png' },
-    { nombre: 'Chivas Guadalajara',img: 'chivas.png' },
-    { nombre: 'Cruz Azul',         img: 'cruz_azul.png' },
-    { nombre: 'FC Juárez',         img: 'juarez.png' },
-    { nombre: 'León',              img: 'leon.png' },
-    { nombre: 'Monterrey',         img: 'mty.png' },
-    { nombre: 'Necaxa',            img: 'necaxa.png' },
-    { nombre: 'Pachuca',           img: 'pachuca.png' },
-    { nombre: 'Puebla FC',         img: 'puebla.png' },
-    { nombre: 'Pumas UNAM',        img: 'pumas.png' },
-    { nombre: 'Querétaro',         img: 'queretaro.png' },
-    { nombre: 'Santos Laguna',     img: 'santos.png' },
-    { nombre: 'Atlético San Luis', img: 'san_luis.png' },
-    { nombre: 'Tigres UANL',       img: 'tigres.png' },
-    { nombre: 'Tijuana',           img: 'xolos.png' },
-    { nombre: 'Toluca',            img: 'toluca.png' }
-];
+// ── Configurar jornada ────────────────────────────────────────────────────────
 
 function getEquiposUsados() {
     const usados = new Set();
@@ -56,7 +49,7 @@ function equipoOptions(selected = '', excluir = new Set()) {
     return EQUIPOS
         .filter(e => !excluir.has(e.img))
         .map(e =>
-            `<option value="${e.img}" data-nombre="${e.nombre}" ${selected === e.img ? 'selected' : ''}>${e.nombre}</option>`
+            `<option value="${escapeHTML(e.img)}" data-nombre="${escapeHTML(e.nombre)}" ${selected === e.img ? 'selected' : ''}>${escapeHTML(e.nombre)}</option>`
         ).join('');
 }
 
@@ -80,71 +73,50 @@ function agregarPartido(localImg = '', visitaImg = '', fecha = '', hora = '') {
         <span class="partido-num">${idx + 1}</span>
         <div class="partido-admin-equipo">
             <label>Local</label>
-            <select class="local-select" onchange="previewTeam(this, 'local-img-${idx}')">
+            <select class="local-select">
                 <option value="">-- Equipo --</option>
                 ${equipoOptions(localImg)}
             </select>
-            <img id="local-img-${idx}" class="team-preview"
-                 src="${localImg ? './img/' + localImg : ''}"
-                 alt=""
-                 style="${localImg ? '' : 'visibility:hidden'}">
+            <img class="team-preview" alt="">
         </div>
         <div class="partido-admin-centro">
-            <input type="date" class="partido-fecha" value="${fecha}">
-            <input type="time" class="partido-hora" value="${hora}">
+            <input type="date" class="partido-fecha">
+            <input type="time" class="partido-hora">
         </div>
         <div class="partido-admin-equipo">
             <label>Visita</label>
-            <select class="visita-select" onchange="previewTeam(this, 'visita-img-${idx}')">
+            <select class="visita-select">
                 <option value="">-- Equipo --</option>
                 ${equipoOptions(visitaImg)}
             </select>
-            <img id="visita-img-${idx}" class="team-preview"
-                 src="${visitaImg ? './img/' + visitaImg : ''}"
-                 alt=""
-                 style="${visitaImg ? '' : 'visibility:hidden'}">
+            <img class="team-preview" alt="">
         </div>
-        <button class="btn-remove" onclick="this.closest('.partido-admin').remove(); renumerarPartidos(); actualizarOpcionesDisponibles()">
+        <button class="btn-remove" type="button" aria-label="Quitar partido">
             <i class="fa-solid fa-trash"></i>
         </button>`;
+
+    div.querySelector('.partido-fecha').value = fecha;
+    div.querySelector('.partido-hora').value  = hora;
+
+    div.querySelectorAll('select').forEach(sel => {
+        const img = sel.parentElement.querySelector('.team-preview');
+        sel.addEventListener('change', () => previewTeam(sel, img));
+        previewTeam(sel, img, false);
+    });
+
+    div.querySelector('.btn-remove').addEventListener('click', () => {
+        div.remove();
+        renumerarPartidos();
+        actualizarOpcionesDisponibles();
+    });
+
     contenedor.appendChild(div);
     actualizarOpcionesDisponibles();
 }
 
-function limpiarPartidos() {
-    if (!confirm('¿Limpiar todos los partidos del formulario?')) return;
+async function limpiarPartidos() {
+    if (!(await confirmar('¿Limpiar todos los partidos del formulario?', { aceptar: 'Limpiar' }))) return;
     document.getElementById('partidos-admin').innerHTML = '';
-}
-
-async function archivarJornada() {
-    const numero = _jornadaActualNum;
-
-    if (!numero) { alert("No hay jornada activa para archivar."); return; }
-
-    if (!confirm(`¿Archivar la Jornada ${numero}?\n\nLos partidos y quinielas quedarán guardados en el historial pero ya no serán la jornada activa.`)) return;
-
-    try {
-        const res = await fetchWithRetry(`${apiURL}/archivarJornada`, {
-            method: 'PUT',
-            headers: adminHeaders(),
-            body: JSON.stringify({ numero })
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-            alert(data.message);
-            _jornadaActualNum = null;
-            document.getElementById('partidos-admin').innerHTML = '';
-            document.getElementById('jornada-numero').value = '';
-            document.getElementById('resultados-admin').innerHTML = '';
-            document.getElementById('jornada-actual-info').textContent = 'No hay jornada activa.';
-            cargarQuinielasAdmin();
-        } else {
-            alert(data.message || "Error al archivar la jornada.");
-        }
-    } catch {
-        alert("Error al conectar con el servidor.");
-    }
 }
 
 function renumerarPartidos() {
@@ -153,29 +125,26 @@ function renumerarPartidos() {
     });
 }
 
-function previewTeam(select, imgId) {
-    const img = document.getElementById(imgId);
+function previewTeam(select, img, actualizar = true) {
     if (!img) return;
     const opt = select.options[select.selectedIndex];
     if (select.value) {
         img.src = `./img/${select.value}`;
-        img.alt = opt.dataset.nombre || '';
+        img.alt = opt?.dataset.nombre || '';
         img.style.visibility = 'visible';
     } else {
+        img.removeAttribute('src');
         img.style.visibility = 'hidden';
     }
-    actualizarOpcionesDisponibles();
+    if (actualizar) actualizarOpcionesDisponibles();
 }
 
 async function guardarJornada() {
     const numero = parseInt(document.getElementById('jornada-numero').value);
+    if (!numero) { toast('Ingresa el número de jornada.', 'error'); return; }
 
-    if (!numero) { alert("Ingresa el número de jornada."); return; }
-
-    const filas = document.querySelectorAll('.partido-admin');
     const partidos = [];
-
-    for (const fila of filas) {
+    for (const fila of document.querySelectorAll('.partido-admin')) {
         const localSel  = fila.querySelector('.local-select');
         const visitaSel = fila.querySelector('.visita-select');
         const fecha     = fila.querySelector('.partido-fecha').value;
@@ -186,97 +155,143 @@ async function guardarJornada() {
         const visita    = visitaSel.options[visitaSel.selectedIndex]?.dataset.nombre || '';
 
         if (!localImg || !visitaImg || !fecha || !hora) {
-            alert("Completa todos los campos de cada partido (equipos, fecha y hora).");
+            toast('Completa todos los campos de cada partido (equipos, fecha y hora).', 'error');
             return;
         }
         partidos.push({ local, localImg, visita, visitaImg, fecha, hora });
     }
 
-    if (partidos.length === 0) {
-        alert("Agrega al menos un partido.");
-        return;
-    }
+    if (partidos.length === 0) { toast('Agrega al menos un partido.', 'error'); return; }
 
     try {
-        const res = await fetchWithRetry(`${apiURL}/setJornada`, {
+        const { res, data } = await apiAdmin('/setJornada', {
             method: 'PUT',
-            headers: adminHeaders(),
             body: JSON.stringify({ numero, partidos })
         });
-        const data = await res.json();
-        alert(data.message);
+        toast(data.message || 'Error al guardar la jornada.', res.ok ? 'exito' : 'error');
         if (res.ok) cargarJornadaActual();
     } catch {
-        alert("Error al guardar la jornada.");
+        toast('Error al guardar la jornada.', 'error');
     }
 }
 
-async function guardarResultados() {
-    const numeroEl = document.getElementById('resultados-jornada-num');
-    if (!numeroEl) { alert("Carga primero la jornada."); return; }
-    const numero = parseInt(numeroEl.value);
+async function archivarJornada() {
+    const numero = _jornadaActualNum;
+    if (!numero) { toast('No hay jornada activa para archivar.', 'error'); return; }
 
-    const selects = document.querySelectorAll('.resultado-select');
-    const resultados = Array.from(selects).map(s => s.value);
+    const ok = await confirmar(
+        `Los partidos y quinielas de la Jornada ${numero} quedarán guardados en el historial, pero ya no será la jornada activa.`,
+        { titulo: `¿Archivar la Jornada ${numero}?`, aceptar: 'Archivar' }
+    );
+    if (!ok) return;
 
     try {
-        const res = await fetchWithRetry(`${apiURL}/setResultados`, {
+        const { res, data } = await apiAdmin('/archivarJornada', {
             method: 'PUT',
-            headers: adminHeaders(),
-            body: JSON.stringify({ numero, resultados })
+            body: JSON.stringify({ numero })
         });
-        const data = await res.json();
-        alert(data.message);
+        if (res.ok) {
+            toast(data.message, 'exito');
+            _jornadaActualNum = null;
+            document.getElementById('partidos-admin').innerHTML = '';
+            document.getElementById('jornada-numero').value = '';
+            document.getElementById('resultados-admin').innerHTML = '';
+            document.getElementById('jornada-actual-info').textContent = 'No hay jornada activa.';
+            document.getElementById('envios-banner').style.display = 'none';
+            cargarQuinielasAdmin();
+            cargarParticipantes();
+        } else {
+            toast(data.message || 'Error al archivar la jornada.', 'error');
+        }
     } catch {
-        alert("Error al guardar los resultados.");
+        toast('Error al conectar con el servidor.', 'error');
     }
 }
 
-function actualizarBannerEnvios(abiertos) {
-    const banner  = document.getElementById('envios-banner');
-    const icon    = document.getElementById('envios-icon');
-    const titulo  = document.getElementById('envios-titulo');
-    const desc    = document.getElementById('envios-desc');
-    const btn     = document.getElementById('btn-toggle-envios');
+// ── Envíos ────────────────────────────────────────────────────────────────────
+
+function formatCierre(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString('es-MX', {
+        weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'
+    });
+}
+
+function actualizarBannerEnvios({ enviosAbiertos, aceptaEnvios, cierreEnvios }) {
+    const banner = document.getElementById('envios-banner');
+    const icon   = document.getElementById('envios-icon');
+    const titulo = document.getElementById('envios-titulo');
+    const desc   = document.getElementById('envios-desc');
+    const btn    = document.getElementById('btn-toggle-envios');
     if (!banner) return;
 
     banner.style.display = 'flex';
+    const cierre = formatCierre(cierreEnvios);
 
-    if (abiertos) {
-        banner.className = 'envios-banner envios-banner--abierto';
-        icon.className   = 'fa-solid fa-paper-plane envios-banner-icon';
+    if (aceptaEnvios) {
+        banner.className   = 'envios-banner envios-banner--abierto';
+        icon.className     = 'fa-solid fa-paper-plane envios-banner-icon';
         titulo.textContent = 'Envíos abiertos';
-        desc.textContent   = 'Los participantes pueden enviar su quiniela.';
-        btn.innerHTML      = '<i class="fa-solid fa-lock"></i> Cerrar Envíos';
-        btn.className      = 'btn-toggle-envios btn-cerrar-envios';
+        desc.textContent   = cierre
+            ? `Se cerrarán automáticamente al iniciar el primer partido (${cierre}).`
+            : 'Los participantes pueden enviar su quiniela.';
     } else {
-        banner.className = 'envios-banner envios-banner--cerrado';
-        icon.className   = 'fa-solid fa-lock envios-banner-icon';
+        banner.className   = 'envios-banner envios-banner--cerrado';
+        icon.className     = 'fa-solid fa-lock envios-banner-icon';
         titulo.textContent = 'Envíos cerrados';
-        desc.textContent   = 'Los participantes no pueden enviar quinielas.';
-        btn.innerHTML      = '<i class="fa-solid fa-lock-open"></i> Abrir Envíos';
-        btn.className      = 'btn-toggle-envios btn-abrir-envios';
+        desc.textContent   = enviosAbiertos
+            ? `Se cerraron automáticamente porque ya inició el primer partido (${cierre}).`
+            : 'Los cerraste manualmente. Los participantes no pueden enviar quinielas.';
+    }
+
+    if (enviosAbiertos) {
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> Cerrar Envíos';
+        btn.className = 'btn-toggle-envios btn-cerrar-envios';
+        btn.disabled  = !aceptaEnvios;
+        btn.title     = aceptaEnvios ? '' : 'El cierre automático ya ocurrió; cambia la fecha del primer partido para reabrir.';
+    } else {
+        btn.innerHTML = '<i class="fa-solid fa-lock-open"></i> Abrir Envíos';
+        btn.className = 'btn-toggle-envios btn-abrir-envios';
+        btn.disabled  = false;
+        btn.title     = '';
     }
 }
 
 async function toggleEnvios() {
     const numero = _jornadaActualNum;
-    if (!numero) { alert("No hay jornada activa."); return; }
+    if (!numero) { toast('No hay jornada activa.', 'error'); return; }
 
     try {
-        const res = await fetchWithRetry(`${apiURL}/toggleEnvios`, {
+        const { res, data } = await apiAdmin('/toggleEnvios', {
             method: 'PUT',
-            headers: adminHeaders(),
             body: JSON.stringify({ numero })
         });
-        const data = await res.json();
         if (res.ok) {
-            actualizarBannerEnvios(data.enviosAbiertos);
+            actualizarBannerEnvios(data);
+            toast(data.message, 'exito');
         } else {
-            alert(data.message || "Error al cambiar el estado de envíos.");
+            toast(data.message || 'Error al cambiar el estado de envíos.', 'error');
         }
     } catch {
-        alert("Error al conectar con el servidor.");
+        toast('Error al conectar con el servidor.', 'error');
+    }
+}
+
+// ── Resultados ────────────────────────────────────────────────────────────────
+
+async function guardarResultados() {
+    if (!_jornadaActualNum) { toast('Carga primero la jornada.', 'error'); return; }
+
+    const resultados = Array.from(document.querySelectorAll('.resultado-select')).map(s => s.value);
+
+    try {
+        const { res, data } = await apiAdmin('/setResultados', {
+            method: 'PUT',
+            body: JSON.stringify({ numero: _jornadaActualNum, resultados })
+        });
+        toast(data.message || 'Error al guardar los resultados.', res.ok ? 'exito' : 'error');
+    } catch {
+        toast('Error al guardar los resultados.', 'error');
     }
 }
 
@@ -297,34 +312,31 @@ async function cargarJornadaActual() {
             return;
         }
 
-        const { numero, partidos, enviosAbiertos } = data.jornada;
+        const { numero, partidos } = data.jornada;
         _jornadaActualNum = numero;
         info.textContent = `Jornada ${numero} — ${partidos.length} partidos`;
-        actualizarBannerEnvios(enviosAbiertos !== false);
+        actualizarBannerEnvios(data.jornada);
 
-        // Campo oculto con el número de jornada para guardar resultados
-        contenedorResultados.innerHTML = `<input type="hidden" id="resultados-jornada-num" value="${numero}">`;
-
-        partidos.forEach((p, i) => {
-            const row = document.createElement('div');
-            row.className = 'resultado-admin-row';
-            row.innerHTML = `
-                <img src="./img/${p.localImg}" alt="${p.local}" class="team-mini" title="${p.local}">
-                <span class="partido-vs">${p.local} vs ${p.visita}</span>
-                <img src="./img/${p.visitaImg}" alt="${p.visita}" class="team-mini" title="${p.visita}">
-                <select class="resultado-select" data-index="${i}">
-                    <option value=""   ${!p.resultado ? 'selected' : ''}>Sin resultado</option>
-                    <option value="local"  ${p.resultado === 'local'  ? 'selected' : ''}>Local — ${p.local}</option>
-                    <option value="empate" ${p.resultado === 'empate' ? 'selected' : ''}>Empate</option>
-                    <option value="visita" ${p.resultado === 'visita' ? 'selected' : ''}>Visita — ${p.visita}</option>
-                </select>`;
-            contenedorResultados.appendChild(row);
-        });
+        contenedorResultados.innerHTML = partidos.map((p, i) => {
+            const local  = escapeHTML(p.local);
+            const visita = escapeHTML(p.visita);
+            return `
+                <div class="resultado-admin-row">
+                    <img src="./img/${escapeHTML(p.localImg)}" alt="${local}" class="team-mini" title="${local}">
+                    <span class="partido-vs">${local} vs ${visita}</span>
+                    <img src="./img/${escapeHTML(p.visitaImg)}" alt="${visita}" class="team-mini" title="${visita}">
+                    <select class="resultado-select" data-index="${i}">
+                        <option value=""       ${!p.resultado ? 'selected' : ''}>Sin resultado</option>
+                        <option value="local"  ${p.resultado === 'local'  ? 'selected' : ''}>Local — ${local}</option>
+                        <option value="empate" ${p.resultado === 'empate' ? 'selected' : ''}>Empate</option>
+                        <option value="visita" ${p.resultado === 'visita' ? 'selected' : ''}>Visita — ${visita}</option>
+                    </select>
+                </div>`;
+        }).join('');
 
         // Pre-cargar el formulario de configurar jornada con los datos actuales
         document.getElementById('jornada-numero').value = numero;
-        const contenedorPartidos = document.getElementById('partidos-admin');
-        contenedorPartidos.innerHTML = '';
+        document.getElementById('partidos-admin').innerHTML = '';
         partidos.forEach(p => agregarPartido(p.localImg, p.visitaImg, p.fecha, p.hora));
         actualizarOpcionesDisponibles();
 
@@ -332,6 +344,8 @@ async function cargarJornadaActual() {
         info.textContent = 'Error al cargar la jornada.';
     }
 }
+
+// ── Eliminar quinielas ────────────────────────────────────────────────────────
 
 async function cargarQuinielasAdmin() {
     const lista = document.getElementById('quinielas-admin-list');
@@ -344,8 +358,8 @@ async function cargarQuinielasAdmin() {
     lista.innerHTML = '<p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
 
     try {
-        const res = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
-        const data = await res.json();
+        const { res, data } = await apiAdmin(`/admin/quinielas?jornada=${_jornadaActualNum}`);
+        if (!res.ok) throw new Error(data.message);
         const quinielas = data.quinielas;
 
         if (!quinielas || quinielas.length === 0) {
@@ -353,10 +367,8 @@ async function cargarQuinielasAdmin() {
             return;
         }
 
-        const BADGE = { local: 'L', empate: 'E', visita: 'V' };
         const BADGE_CLS = { local: 'pred-local', empate: 'pred-empate', visita: 'pred-visita' };
 
-        lista.innerHTML = '';
         const grid = document.createElement('div');
         grid.className = 'quinielas-admin-grid';
 
@@ -367,23 +379,26 @@ async function cargarQuinielasAdmin() {
 
             const predRows = q.partidos.map(p => `
                 <div class="quiniela-pred-row">
-                    <span class="pred-equipo">${p.local}</span>
-                    <span class="pred-badge ${BADGE_CLS[p.resultado] || ''}">${BADGE[p.resultado] || '?'}</span>
-                    <span class="pred-equipo pred-right">${p.visita}</span>
+                    <span class="pred-equipo">${escapeHTML(p.local)}</span>
+                    <span class="pred-badge ${BADGE_CLS[p.resultado] || ''}">${letraResultado(p.resultado)}</span>
+                    <span class="pred-equipo pred-right">${escapeHTML(p.visita)}</span>
                 </div>`).join('');
 
             card.innerHTML = `
                 <div class="quiniela-admin-header">
-                    <span class="quiniela-admin-nombre">${q.nombre}</span>
-                    <span class="quiniela-admin-jornada-badge">J${q.jornada ?? '—'}</span>
+                    <span class="quiniela-admin-nombre">${escapeHTML(q.nombre)}</span>
+                    <span class="quiniela-admin-jornada-badge">J${escapeHTML(q.jornada ?? '—')}</span>
                 </div>
                 <div class="quiniela-admin-partidos">${predRows}</div>
-                <button class="btn-eliminar-quiniela" onclick="eliminarQuinielaAdmin('${q._id}', '${q.nombre.replace(/'/g, "\\'")}')">
+                <button class="btn-eliminar-quiniela" type="button">
                     <i class="fa-solid fa-trash"></i> Eliminar
                 </button>`;
+            card.querySelector('.btn-eliminar-quiniela')
+                .addEventListener('click', () => eliminarQuinielaAdmin(q._id, q.nombre));
             grid.appendChild(card);
         });
 
+        lista.innerHTML = '';
         lista.appendChild(grid);
     } catch {
         lista.innerHTML = '<p class="aviso" style="color:#f87171">Error al cargar las quinielas.</p>';
@@ -391,68 +406,66 @@ async function cargarQuinielasAdmin() {
 }
 
 async function eliminarQuinielaAdmin(id, nombre) {
-    if (!confirm(`¿Eliminar la quiniela de "${nombre}"?`)) return;
+    const ok = await confirmar(`Se eliminará la quiniela de "${nombre}". Esta acción no se puede deshacer.`,
+        { titulo: '¿Eliminar quiniela?', aceptar: 'Eliminar', peligro: true });
+    if (!ok) return;
 
     try {
-        const res = await fetchWithRetry(`${apiURL}/deleteQuiniela/${id}`, { method: 'DELETE', headers: adminHeaders() });
-        const data = await res.json();
+        const { res, data } = await apiAdmin(`/deleteQuiniela/${encodeURIComponent(id)}`, { method: 'DELETE' });
 
         if (res.ok) {
-            const card = document.querySelector(`.quiniela-admin-card[data-id="${id}"]`);
-            if (card) card.remove();
+            document.querySelector(`.quiniela-admin-card[data-id="${CSS.escape(id)}"]`)?.remove();
             const lista = document.getElementById('quinielas-admin-list');
             if (!lista.querySelector('.quiniela-admin-card')) {
                 lista.innerHTML = '<p class="aviso">No hay quinielas registradas.</p>';
             }
+            toast('Quiniela eliminada.', 'exito');
+            cargarParticipantes();
         } else {
-            alert(data.message || "Error al eliminar.");
+            toast(data.message || 'Error al eliminar.', 'error');
         }
     } catch {
-        alert("Error al eliminar la quiniela.");
+        toast('Error al eliminar la quiniela.', 'error');
     }
 }
 
+// ── Historial ─────────────────────────────────────────────────────────────────
 
 async function limpiarHistorial() {
-    if (!confirm('¿Eliminar todo el historial?\n\nSe borrarán permanentemente todas las jornadas archivadas y sus quinielas.')) return;
-    if (!confirm('Confirma de nuevo: ¿eliminar el historial completo? Esta acción no se puede deshacer.')) return;
+    const ok1 = await confirmar('Se borrarán permanentemente todas las jornadas archivadas y sus quinielas.',
+        { titulo: '¿Eliminar todo el historial?', aceptar: 'Continuar', peligro: true });
+    if (!ok1) return;
+    const ok2 = await confirmar('Esta acción no se puede deshacer.',
+        { titulo: 'Confirma de nuevo', aceptar: 'Eliminar historial', peligro: true });
+    if (!ok2) return;
 
     try {
-        const res = await fetchWithRetry(`${apiURL}/deleteHistorial`, {
-            method: 'DELETE',
-            headers: adminHeaders()
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-            alert(data.message);
-        } else {
-            alert(data.message || "Error al limpiar el historial.");
-        }
+        const { res, data } = await apiAdmin('/deleteHistorial', { method: 'DELETE' });
+        toast(data.message || 'Error al limpiar el historial.', res.ok ? 'exito' : 'error', 5000);
     } catch {
-        alert("Error al conectar con el servidor.");
+        toast('Error al conectar con el servidor.', 'error');
     }
 }
+
+// ── Participantes y pagos ─────────────────────────────────────────────────────
 
 async function actualizarPago(id, estado, selectEl) {
     selectEl.disabled = true;
     try {
-        const res = await fetchWithRetry(`${apiURL}/updatePago/${id}`, {
+        const { res } = await apiAdmin(`/updatePago/${encodeURIComponent(id)}`, {
             method: 'PATCH',
-            headers: adminHeaders(),
             body: JSON.stringify({ estadoPago: estado })
         });
         if (res.ok) {
             selectEl.className = `pago-estado-select pago-estado--${estado}`;
-            const icono = selectEl.nextElementSibling;
-            if (icono) icono.style.color = '';
             actualizarResumenPagos();
         } else {
-            alert("Error al actualizar el estado de pago.");
+            toast('Error al actualizar el estado de pago.', 'error');
             selectEl.value = estado === 'pagado' ? 'pendiente' : 'pagado';
         }
     } catch {
-        alert("Error al conectar con el servidor.");
+        toast('Error al conectar con el servidor.', 'error');
+        selectEl.value = estado === 'pagado' ? 'pendiente' : 'pagado';
     } finally {
         selectEl.disabled = false;
     }
@@ -481,8 +494,8 @@ async function cargarParticipantes() {
     lista.innerHTML = '<p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
 
     try {
-        const res = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${_jornadaActualNum}`);
-        const data = await res.json();
+        const { res, data } = await apiAdmin(`/admin/quinielas?jornada=${_jornadaActualNum}`);
+        if (!res.ok) throw new Error(data.message);
         const quinielas = data.quinielas;
 
         if (!quinielas || quinielas.length === 0) {
@@ -490,51 +503,47 @@ async function cargarParticipantes() {
             return;
         }
 
-        lista.innerHTML = '';
-
-        const topBar = document.createElement('div');
-        topBar.className = 'participantes-top-bar';
-        topBar.innerHTML = `
-            <p class="participantes-counter">
-                <i class="fa-solid fa-users"></i>
-                ${quinielas.length} participante${quinielas.length !== 1 ? 's' : ''} — Jornada ${_jornadaActualNum}
-            </p>
-            <div class="participantes-resumen" id="participantes-resumen"></div>`;
-        lista.appendChild(topBar);
+        lista.innerHTML = `
+            <div class="participantes-top-bar">
+                <p class="participantes-counter">
+                    <i class="fa-solid fa-users"></i>
+                    ${quinielas.length} participante${quinielas.length !== 1 ? 's' : ''} — Jornada ${_jornadaActualNum}
+                </p>
+                <div class="participantes-resumen" id="participantes-resumen"></div>
+            </div>`;
 
         const tabla = document.createElement('div');
         tabla.className = 'participantes-tabla';
-
-        const header = document.createElement('div');
-        header.className = 'participante-row participante-row--header';
-        header.innerHTML = `
-            <span>#</span>
-            <span>Nombre</span>
-            <span>Celular</span>
-            <span>Pago</span>`;
-        tabla.appendChild(header);
+        tabla.innerHTML = `
+            <div class="participante-row participante-row--header">
+                <span>#</span>
+                <span>Nombre</span>
+                <span>Celular</span>
+                <span>Pago</span>
+            </div>`;
 
         quinielas.forEach((q, i) => {
             const row = document.createElement('div');
             row.className = 'participante-row';
             const celularHTML = q.celular
-                ? `<span class="celular-texto"><i class="fa-solid fa-phone"></i> ${q.celular}</span>`
+                ? `<span class="celular-texto"><i class="fa-solid fa-phone"></i> ${escapeHTML(q.celular)}</span>`
                 : `<span class="sin-celular">—</span>`;
-            const estado = q.estadoPago || 'pendiente';
+            const estado = q.estadoPago === 'pagado' ? 'pagado' : 'pendiente';
             row.innerHTML = `
                 <span class="participante-num">${i + 1}</span>
-                <span class="participante-nombre">${q.nombre || '—'}</span>
+                <span class="participante-nombre">${escapeHTML(q.nombre || '—')}</span>
                 <span class="participante-celular">${celularHTML}</span>
                 <span class="participante-pago">
                     <span class="pago-select-wrap">
-                        <select class="pago-estado-select pago-estado--${estado}"
-                                onchange="actualizarPago('${q._id}', this.value, this)">
+                        <select class="pago-estado-select pago-estado--${estado}">
                             <option value="pendiente" ${estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
                             <option value="pagado"    ${estado === 'pagado'    ? 'selected' : ''}>Pagado</option>
                         </select>
                         <i class="fa-solid fa-chevron-down pago-select-icono"></i>
                     </span>
                 </span>`;
+            const select = row.querySelector('select');
+            select.addEventListener('change', () => actualizarPago(q._id, select.value, select));
             tabla.appendChild(row);
         });
 
@@ -545,16 +554,34 @@ async function cargarParticipantes() {
     }
 }
 
+// ── Login ─────────────────────────────────────────────────────────────────────
+
+async function iniciarPanel() {
+    document.getElementById('admin-password').disabled = true;
+    const btn = document.querySelector('.password-row .btn-primary');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Verificado';
+    btn.style.background = 'var(--green)';
+    document.getElementById('admin-tab-bar').style.display = 'flex';
+    switchTab('jornada');
+    for (let i = 0; i < 9; i++) agregarPartido();
+    await cargarJornadaActual();
+    cargarQuinielasAdmin();
+    cargarParticipantes();
+}
+
 async function verificarAdmin() {
     const password = document.getElementById('admin-password').value;
     const errorEl  = document.getElementById('password-error');
     const btn      = document.querySelector('.password-row .btn-primary');
 
-    if (!password) {
+    const mostrarError = msg => {
         errorEl.style.display = 'block';
-        errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Ingresa la contraseña.';
-        return;
-    }
+        errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ';
+        errorEl.append(msg);
+    };
+
+    if (!password) { mostrarError('Ingresa la contraseña.'); return; }
 
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -565,33 +592,20 @@ async function verificarAdmin() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password })
         });
+        const data = await res.json().catch(() => ({}));
 
         if (res.ok) {
-            const data = await res.json();
             sessionStorage.setItem('adminToken', data.token);
             errorEl.style.display = 'none';
-            document.getElementById('admin-password').disabled = true;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Verificado';
-            btn.style.background = 'var(--green)';
-            document.getElementById('admin-tab-bar').style.display = 'flex';
-            switchTab('jornada');
-            for (let i = 0; i < 9; i++) agregarPartido();
-            await cargarJornadaActual();
-            cargarQuinielasAdmin();
-            cargarParticipantes();
+            await iniciarPanel();
         } else {
-            const data = await res.json().catch(() => ({}));
-            const msg = data.message || 'Contraseña incorrecta.';
-            errorEl.style.display = 'block';
-            errorEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
+            mostrarError(data.message || 'Contraseña incorrecta.');
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Continuar';
             document.getElementById('admin-password').focus();
         }
     } catch {
-        errorEl.style.display = 'block';
-        errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Error al conectar con el servidor.';
+        mostrarError('Error al conectar con el servidor.');
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Continuar';
     }

@@ -33,6 +33,7 @@
         <!-- Encabezado con título y barra de progreso -->
         <div class="form-header">
             <h1>Jornada</h1>
+            <p class="cierre-envios" id="cierre-envios" style="display:none"></p>
             <div class="progreso-wrap" id="progreso-wrap">
                 <div class="progreso-label">
                     <span id="progreso-count">0</span>
@@ -59,8 +60,9 @@
 
         <!-- Footer sticky con nombre y enviar -->
         <div class="form-footer">
-            <input type="text" id="nombre" placeholder="Tu nombre" autocomplete="off" required>
-            <button id="btn-enviar" onclick="enviarQuiniela()">
+            <input type="text" id="nombre" placeholder="Tu nombre y apellido" autocomplete="name"
+                   minlength="2" maxlength="40" required>
+            <button id="btn-enviar" type="button" onclick="enviarQuiniela()">
                 <i class="fa-solid fa-paper-plane"></i> Enviar Quiniela
             </button>
         </div>
@@ -68,6 +70,7 @@
     </section>
 
     <script src="./js/config.js"></script>
+    <script src="./js/ui.js"></script>
     <script src="./js/nav.js"></script>
     <script src="./js/scriptPartidos.js"></script>
     <script src="./js/agregarQuiniela.js"></script>

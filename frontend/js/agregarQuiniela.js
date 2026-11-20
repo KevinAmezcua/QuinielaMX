@@ -1,52 +1,59 @@
+const NOMBRE_VALIDO = /^[\p{L}\p{N} .'-]+$/u;
+
 async function enviarQuiniela() {
-    const nombre = document.getElementById('nombre').value.trim();
+    const nombre = document.getElementById('nombre').value.replace(/\s+/g, ' ').trim();
     const contenedor = document.getElementById('partidos-form');
-    const jornadaNum = parseInt(contenedor?.dataset.jornada) || null;
     const partidosDOM = contenedor.querySelectorAll('.partido');
-    const partidos = [];
+    const btn = document.getElementById('btn-enviar');
 
-    partidosDOM.forEach(partido => {
-        const localImg = partido.querySelector('.local img');
-        const visitaImg = partido.querySelector('.visita img');
-        const resultado = partido.querySelector('.resultado-oculto')?.value;
+    const partidos = Array.from(partidosDOM).map(partido => ({
+        local:     partido.dataset.local || '',
+        visita:    partido.dataset.visita || '',
+        resultado: partido.querySelector('.resultado-oculto')?.value
+    }));
 
-        if (resultado) {
-            partidos.push({
-                local: localImg ? localImg.alt : '',
-                visita: visitaImg ? visitaImg.alt : '',
-                resultado
-            });
-        }
-    });
-
-    if (!nombre) {
-        alert("Por favor ingresa tu nombre.");
+    if (nombre.length < 2) {
+        toast('Por favor ingresa tu nombre (mínimo 2 caracteres).', 'error');
+        document.getElementById('nombre').focus();
         return;
     }
-    if (partidos.length !== partidosDOM.length) {
-        alert("Debes seleccionar un resultado para todos los partidos.");
+    if (nombre.length > 40 || !NOMBRE_VALIDO.test(nombre)) {
+        toast("El nombre solo puede tener letras, números, espacios y . ' - (máximo 40).", 'error');
+        return;
+    }
+    const faltantes = partidos.filter(p => !p.resultado).length;
+    if (faltantes > 0) {
+        toast(`Te falta${faltantes > 1 ? 'n' : ''} ${faltantes} partido${faltantes > 1 ? 's' : ''} por elegir.`, 'error');
         return;
     }
 
-    if (!confirm(`¿Deseas enviar tu quiniela como "${nombre}"?`)) return;
+    const ok = await confirmar(`Se enviará tu quiniela a nombre de "${nombre}". Después ya no podrás modificarla.`,
+        { titulo: '¿Enviar quiniela?', aceptar: 'Enviar' });
+    if (!ok) return;
+
+    btn.disabled = true;
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
 
     try {
         const res = await fetchWithRetry(`${apiURL}/newQuiniela`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, partidos, jornada: jornadaNum })
+            body: JSON.stringify({ nombre, partidos })
         });
-
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
 
         if (res.ok) {
-            window.location.href = './resultados.html';
-        } else {
-            alert(data.message || "Error al enviar la quiniela.");
+            borrarBorrador();
+            window.location.href = `./resultados.html?yo=${encodeURIComponent(nombre)}`;
+            return;
         }
-
+        toast(data.message || 'Error al enviar la quiniela.', 'error', 6000);
     } catch (error) {
-        alert("Error al enviar la quiniela.");
+        toast('Error al enviar la quiniela. Revisa tu conexión.', 'error');
         console.error(error);
     }
+
+    btn.disabled = false;
+    btn.innerHTML = textoOriginal;
 }

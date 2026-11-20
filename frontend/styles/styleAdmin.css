@@ -878,3 +878,8 @@
     .password-row { flex-direction: column; align-items: stretch; }
     .password-row .btn-primary { justify-content: center; }
 }
+
+.btn-toggle-envios:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

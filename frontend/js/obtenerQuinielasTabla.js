@@ -1,37 +1,75 @@
-let _jornada    = null;
-let _quinielas  = [];
-let _todasJornadas = [];
+let _jornada = null;
+let _ranking = [];
+
+// Nombre de quien acaba de enviar su quiniela (?yo=Nombre).
+const _yo = new URLSearchParams(location.search).get('yo');
+
+function normalizar(nombre = '') {
+    return String(nombre).normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function esYo(nombre) {
+    return _yo && normalizar(nombre) === normalizar(_yo);
+}
+
+function medalla(posicion) {
+    return posicion === 1 ? 'medalla-oro'
+         : posicion === 2 ? 'medalla-plata'
+         : posicion === 3 ? 'medalla-bronce'
+         : '';
+}
+
+function chipsQuiniela(q, partidosJornada) {
+    return q.partidos.map((p, i) => {
+        const cls = p.pendiente ? 'chip-pending' : p.correcto ? 'chip-ok' : 'chip-fail';
+        const partido = partidosJornada[i];
+        const title = partido ? `${partido.local} vs ${partido.visita}` : '';
+        return `<span class="chip ${cls}" title="${escapeHTML(title)}">${letraResultado(p.resultado)}</span>`;
+    }).join('');
+}
+
+function tarjetaQuiniela(q, partidosJornada) {
+    return `
+        <div class="quiniela-card ${esYo(q.nombre) ? 'quiniela-card--yo' : ''}">
+            <div class="card-header">
+                <span class="card-rank ${medalla(q.posicion)}">#${q.posicion}</span>
+                <span class="card-nombre">${escapeHTML(q.nombre)}${esYo(q.nombre) ? ' <span class="badge-yo">Tú</span>' : ''}</span>
+                <span class="card-score">${q.aciertos}<span class="score-total">/${q.partidos.length}</span></span>
+            </div>
+            <div class="card-chips">${chipsQuiniela(q, partidosJornada)}</div>
+        </div>`;
+}
 
 async function obtenerQuinielasTabla() {
     try {
-        // 1. Jornada actual
-        const jornadaRes  = await fetchWithRetry(`${apiURL}/getJornada`);
-        const jornadaData = await jornadaRes.json();
-        _jornada = jornadaData.jornada;
+        const res  = await fetchWithRetry(`${apiURL}/ranking`);
+        const data = await res.json();
 
-        if (!_jornada) {
-            document.getElementById('tabla-container').innerHTML =
-                '<p class="aviso">No hay jornada configurada.</p>';
+        if (!res.ok || !data.jornada) {
+            document.getElementById('tabla-container').innerHTML = '<p class="aviso">No hay jornada configurada.</p>';
             document.getElementById('cards-container').innerHTML = '';
             document.getElementById('vista-toggle').style.display = 'none';
             document.querySelector('h1').textContent = 'Resultados';
         } else {
+            _jornada = data.jornada;
+            _ranking = data.ranking;
             document.querySelector('h1').textContent = `Jornada ${_jornada.numero}`;
 
-            // 2. Quinielas de esta jornada
-            const quinRes  = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${_jornada.numero}`);
-            const quinData = await quinRes.json();
-            _quinielas = quinData.quinielas;
-
-            renderTabla();
-            renderCards();
+            if (_ranking.length === 0) {
+                document.getElementById('cards-container').innerHTML = '<p class="aviso">Aún no hay quinielas en esta jornada.</p>';
+            } else {
+                renderTabla();
+                renderCards();
+            }
+            mostrarCompartir();
         }
 
-        // 3. Historial (siempre, independiente de si hay jornada actual)
         cargarHistorial(_jornada ? _jornada.numero : null);
+        cargarTablaGeneral();
 
     } catch (error) {
-        alert("Error al obtener las Quinielas.");
+        toast('Error al obtener las quinielas.', 'error');
         console.error(error);
     }
 }
@@ -39,118 +77,85 @@ async function obtenerQuinielasTabla() {
 // ── TABLA ─────────────────────────────────────────────────────────────────────
 function renderTabla() {
     const trHeader = document.querySelector('.tr-header');
-    trHeader.innerHTML = '<th class="col-sticky-left">Participantes</th>';
+    trHeader.innerHTML = '<th class="col-sticky-left">Participantes</th>' +
+        _jornada.partidos.map(p => `
+            <th>
+                <div class="header-partido">
+                    <img src="./img/${escapeHTML(p.localImg)}" alt="${escapeHTML(p.local)}" title="${escapeHTML(p.local)}">
+                    <img src="./img/${escapeHTML(p.visitaImg)}" alt="${escapeHTML(p.visita)}" title="${escapeHTML(p.visita)}">
+                </div>
+            </th>`).join('') +
+        '<th class="col-sticky-right">Pts</th>';
 
-    _jornada.partidos.forEach(p => {
-        const th = document.createElement('th');
-        th.innerHTML = `
-            <div class="header-partido">
-                <img src="./img/${p.localImg}" alt="${p.local}">
-                <img src="./img/${p.visitaImg}" alt="${p.visita}">
-            </div>`;
-        trHeader.appendChild(th);
-    });
-
-    const thAciertos = document.createElement('th');
-    thAciertos.textContent = 'Pts';
-    thAciertos.className = 'col-sticky-right';
-    trHeader.appendChild(thAciertos);
-
-    const resultadosOficiales = _jornada.partidos.map(p => p.resultado);
-    const tbody = document.getElementById('quiniela');
-    tbody.innerHTML = '';
-
-    _quinielas.forEach(q => {
-        const tr  = document.createElement('tr');
-        let aciertos = 0;
-
-        const tdNombre = document.createElement('td');
-        tdNombre.textContent = q.nombre;
-        tdNombre.className   = 'col-sticky-left';
-        tr.appendChild(tdNombre);
-
-        q.partidos.forEach((p, i) => {
-            const td    = document.createElement('td');
-            const letra = p.resultado === 'local' ? 'L' : p.resultado === 'empate' ? 'E' : 'V';
-            td.textContent = letra;
-
-            if (resultadosOficiales[i] && p.resultado === resultadosOficiales[i]) {
-                td.classList.add('ganador');
-                aciertos++;
-            }
-            tr.appendChild(td);
-        });
-
-        const tdAciertos = document.createElement('td');
-        tdAciertos.textContent = aciertos;
-        tdAciertos.className   = 'col-sticky-right';
-        tr.appendChild(tdAciertos);
-
-        tbody.appendChild(tr);
-    });
+    document.getElementById('quiniela').innerHTML = _ranking.map(q => `
+        <tr class="${esYo(q.nombre) ? 'fila-yo' : ''}">
+            <td class="col-sticky-left">${escapeHTML(q.nombre)}</td>
+            ${q.partidos.map(p => `<td class="${p.correcto ? 'ganador' : ''}">${letraResultado(p.resultado)}</td>`).join('')}
+            <td class="col-sticky-right">${q.aciertos}</td>
+        </tr>`).join('');
 }
 
 // ── TARJETAS ──────────────────────────────────────────────────────────────────
 function renderCards() {
-    const resultadosOficiales = _jornada.partidos.map(p => p.resultado);
+    document.getElementById('cards-container').innerHTML =
+        _ranking.map(q => tarjetaQuiniela(q, _jornada.partidos)).join('');
 
-    const clasificados = _quinielas.map(q => {
-        let aciertos = 0;
-        const partidos = q.partidos.map((p, i) => {
-            const correcto    = !!(resultadosOficiales[i] && p.resultado === resultadosOficiales[i]);
-            const sinOficial  = !resultadosOficiales[i];
-            if (correcto) aciertos++;
-            return { ...p, correcto, sinOficial };
-        });
-        return { ...q, partidos, aciertos };
-    }).sort((a, b) => b.aciertos - a.aciertos);
-
-    const container = document.getElementById('cards-container');
-    container.innerHTML = clasificados.map((q, idx) => {
-        const chips = q.partidos.map((p, i) => {
-            const letra = p.resultado === 'local' ? 'L' : p.resultado === 'empate' ? 'E' : 'V';
-            const cls   = p.sinOficial ? 'chip-pending'
-                        : p.correcto  ? 'chip-ok'
-                        : 'chip-fail';
-            const logo  = _jornada.partidos[i];
-            const title = `${logo.local} vs ${logo.visita}`;
-            return `<span class="chip ${cls}" title="${title}">${letra}</span>`;
-        }).join('');
-
-        const medallaClass = idx === 0 ? 'medalla-oro'
-                           : idx === 1 ? 'medalla-plata'
-                           : idx === 2 ? 'medalla-bronce'
-                           : '';
-
-        return `
-            <div class="quiniela-card">
-                <div class="card-header">
-                    <span class="card-rank ${medallaClass}">#${idx + 1}</span>
-                    <span class="card-nombre">${q.nombre}</span>
-                    <span class="card-score">${q.aciertos}<span class="score-total">/${q.partidos.length}</span></span>
-                </div>
-                <div class="card-chips">${chips}</div>
-            </div>`;
-    }).join('');
+    const mia = document.querySelector('.quiniela-card--yo');
+    if (mia) setTimeout(() => mia.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
 }
 
 // ── TOGGLE VISTA ──────────────────────────────────────────────────────────────
 function setVista(vista) {
     const tablaContainer = document.getElementById('tabla-container');
     const cardsContainer = document.getElementById('cards-container');
-    const btnTabla       = document.getElementById('btn-tabla');
-    const btnCards       = document.getElementById('btn-cards');
+    const esTabla = vista === 'tabla';
 
-    if (vista === 'tabla') {
-        tablaContainer.classList.add('visible');
-        cardsContainer.style.display = 'none';
-        btnTabla.classList.add('activo');
-        btnCards.classList.remove('activo');
-    } else {
-        tablaContainer.classList.remove('visible');
-        cardsContainer.style.display = 'flex';
-        btnCards.classList.add('activo');
-        btnTabla.classList.remove('activo');
+    tablaContainer.classList.toggle('visible', esTabla);
+    cardsContainer.style.display = esTabla ? 'none' : 'flex';
+    document.getElementById('btn-tabla').classList.toggle('activo', esTabla);
+    document.getElementById('btn-cards').classList.toggle('activo', !esTabla);
+}
+
+// ── COMPARTIR ─────────────────────────────────────────────────────────────────
+function mostrarCompartir() {
+    if (!_yo) return;
+    const barra = document.getElementById('compartir-bar');
+    if (!barra) return;
+
+    const urlQuiniela = new URL('./llenarQuiniela.html', location.href).href;
+    const texto = `¡Ya llené mi quiniela de la Jornada ${_jornada.numero}! ⚽ Llena la tuya aquí: ${urlQuiniela}`;
+    document.getElementById('btn-whatsapp').href = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    barra.style.display = 'flex';
+}
+
+// ── TABLA GENERAL ─────────────────────────────────────────────────────────────
+async function cargarTablaGeneral() {
+    const section   = document.getElementById('general-section');
+    const container = document.getElementById('general-container');
+    if (!section) return;
+
+    try {
+        const res  = await fetchWithRetry(`${apiURL}/rankingGeneral`);
+        const data = await res.json();
+        const ranking = data.ranking || [];
+        if (ranking.length === 0) return;
+
+        section.style.display = 'block';
+        container.innerHTML = `
+            <div class="general-tabla">
+                <div class="general-row general-row--header">
+                    <span>#</span><span>Participante</span><span>Jornadas</span><span>Pts</span>
+                </div>
+                ${ranking.map(r => `
+                    <div class="general-row ${esYo(r.nombre) ? 'fila-yo' : ''}">
+                        <span class="card-rank ${medalla(r.posicion)}">${r.posicion}</span>
+                        <span class="general-nombre">${escapeHTML(r.nombre)}</span>
+                        <span>${r.jornadas}</span>
+                        <span class="general-pts">${r.puntos}</span>
+                    </div>`).join('')}
+            </div>`;
+    } catch {
+        container.innerHTML = '<p class="aviso" style="color:#f87171">Error al cargar la tabla general.</p>';
     }
 }
 
@@ -162,9 +167,7 @@ async function cargarHistorial(jornadaActualNum) {
     try {
         const res  = await fetchWithRetry(`${apiURL}/getAllJornadas`);
         const data = await res.json();
-        _todasJornadas = data.jornadas;
-
-        const pasadas = _todasJornadas.filter(j => j.numero !== jornadaActualNum);
+        const pasadas = (data.jornadas || []).filter(j => j.numero !== jornadaActualNum);
 
         if (pasadas.length === 0) return;
 
@@ -181,9 +184,9 @@ async function cargarHistorial(jornadaActualNum) {
             const item = document.createElement('div');
             item.className = 'historial-item';
             item.innerHTML = `
-                <button class="historial-header" onclick="toggleHistorialItem(this, ${jornada.numero})">
+                <button class="historial-header" type="button" aria-expanded="false">
                     <span class="historial-header-titulo">
-                        <i class="fa-solid fa-calendar-days"></i> Jornada ${jornada.numero}
+                        <i class="fa-solid fa-calendar-days"></i> Jornada ${Number(jornada.numero)}
                     </span>
                     ${estadoBadge}
                     <span class="historial-partidos-count">${totalPartidos} partidos</span>
@@ -192,6 +195,8 @@ async function cargarHistorial(jornadaActualNum) {
                 <div class="historial-body" data-loaded="false">
                     <p class="aviso"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
                 </div>`;
+            item.querySelector('.historial-header')
+                .addEventListener('click', e => toggleHistorialItem(e.currentTarget, jornada.numero));
             container.appendChild(item);
         });
 
@@ -203,57 +208,33 @@ async function cargarHistorial(jornadaActualNum) {
 async function toggleHistorialItem(btn, jornadaNum) {
     const item   = btn.closest('.historial-item');
     const body   = item.querySelector('.historial-body');
-    const isOpen = item.classList.contains('abierto');
+    const abrir  = !item.classList.contains('abierto');
 
-    item.classList.toggle('abierto');
+    item.classList.toggle('abierto', abrir);
+    btn.setAttribute('aria-expanded', String(abrir));
 
-    if (!isOpen && body.dataset.loaded === 'false') {
+    if (abrir && body.dataset.loaded === 'false') {
         body.dataset.loaded = 'true';
         await renderHistorialJornada(body, jornadaNum);
     }
 }
 
 async function renderHistorialJornada(body, jornadaNum) {
-    const jornada = _todasJornadas.find(j => j.numero === jornadaNum);
-    if (!jornada) {
-        body.innerHTML = '<p class="aviso">Error: jornada no encontrada.</p>';
-        return;
-    }
-
     try {
-        const res  = await fetchWithRetry(`${apiURL}/getQuiniela?jornada=${jornadaNum}`);
+        const res  = await fetchWithRetry(`${apiURL}/ranking?jornada=${encodeURIComponent(jornadaNum)}`);
         const data = await res.json();
-        const quinielas = data.quinielas;
+        if (!res.ok) throw new Error(data.message);
 
-        if (!quinielas || quinielas.length === 0) {
+        const { jornada, ranking } = data;
+        if (ranking.length === 0) {
             body.innerHTML = '<p class="aviso">No hay quinielas para esta jornada.</p>';
             return;
         }
 
-        const resultadosOficiales = jornada.partidos.map(p => p.resultado);
-
-        // Fila de resultados oficiales
-        const resultChips = jornada.partidos.map((p, i) => {
-            const r     = p.resultado;
-            const label = r === 'local' ? 'L' : r === 'empate' ? 'E' : r === 'visita' ? 'V' : '—';
-            const cls   = r === 'local'  ? 'chip chip-oficial-local'
-                        : r === 'empate' ? 'chip chip-oficial-empate'
-                        : r === 'visita' ? 'chip chip-oficial-visita'
-                        : 'chip chip-pending';
-            return `<span class="${cls}" title="${p.local} vs ${p.visita}">${label}</span>`;
+        const resultChips = jornada.partidos.map(p => {
+            const cls = p.resultado ? `chip chip-oficial-${p.resultado}` : 'chip chip-pending';
+            return `<span class="${cls}" title="${escapeHTML(`${p.local} vs ${p.visita}`)}">${letraResultado(p.resultado)}</span>`;
         }).join('');
-
-        // Clasificación
-        const clasificados = quinielas.map(q => {
-            let aciertos = 0;
-            const partidos = q.partidos.map((p, i) => {
-                const correcto   = !!(resultadosOficiales[i] && p.resultado === resultadosOficiales[i]);
-                const sinOficial = !resultadosOficiales[i];
-                if (correcto) aciertos++;
-                return { ...p, correcto, sinOficial };
-            });
-            return { ...q, partidos, aciertos };
-        }).sort((a, b) => b.aciertos - a.aciertos);
 
         body.innerHTML = `
             <div class="historial-oficiales">
@@ -261,29 +242,7 @@ async function renderHistorialJornada(body, jornadaNum) {
                 <div class="card-chips">${resultChips}</div>
             </div>
             <div class="historial-cards">
-                ${clasificados.map((q, idx) => {
-                    const chips = q.partidos.map((p, i) => {
-                        const letra = p.resultado === 'local' ? 'L' : p.resultado === 'empate' ? 'E' : 'V';
-                        const cls   = p.sinOficial ? 'chip-pending' : p.correcto ? 'chip-ok' : 'chip-fail';
-                        const partido = jornada.partidos[i];
-                        const title = partido ? `${partido.local} vs ${partido.visita}` : '';
-                        return `<span class="chip ${cls}" title="${title}">${letra}</span>`;
-                    }).join('');
-
-                    const medallaClass = idx === 0 ? 'medalla-oro'
-                                       : idx === 1 ? 'medalla-plata'
-                                       : idx === 2 ? 'medalla-bronce' : '';
-
-                    return `
-                        <div class="quiniela-card">
-                            <div class="card-header">
-                                <span class="card-rank ${medallaClass}">#${idx + 1}</span>
-                                <span class="card-nombre">${q.nombre}</span>
-                                <span class="card-score">${q.aciertos}<span class="score-total">/${q.partidos.length}</span></span>
-                            </div>
-                            <div class="card-chips">${chips}</div>
-                        </div>`;
-                }).join('')}
+                ${ranking.map(q => tarjetaQuiniela(q, jornada.partidos)).join('')}
             </div>`;
 
     } catch {

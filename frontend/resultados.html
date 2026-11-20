@@ -45,6 +45,13 @@
     <section class="contenedor-tabla">
         <h1>Jornada</h1>
 
+        <div class="compartir-bar" id="compartir-bar" style="display:none">
+            <span><i class="fa-solid fa-circle-check"></i> ¡Tu quiniela se envió! Está resaltada abajo.</span>
+            <a id="btn-whatsapp" class="btn-whatsapp" href="#" target="_blank" rel="noopener">
+                <i class="fa-brands fa-whatsapp"></i> Invitar por WhatsApp
+            </a>
+        </div>
+
         <div class="vista-toggle" id="vista-toggle">
             <button class="toggle-btn activo" id="btn-cards" onclick="setVista('cards')">
                 <i class="fa-solid fa-id-card"></i> Tarjetas
@@ -66,6 +73,11 @@
         <div id="cards-container" class="cards-container"></div>
     </section>
 
+    <section class="historial-section" id="general-section" style="display:none">
+        <h2 class="historial-titulo"><i class="fa-solid fa-trophy"></i> Tabla general</h2>
+        <div id="general-container"></div>
+    </section>
+
     <section class="historial-section" id="historial-section" style="display:none">
         <h2 class="historial-titulo"><i class="fa-solid fa-clock-rotate-left"></i> Historial</h2>
         <div id="historial-container">
@@ -74,6 +86,7 @@
     </section>
 
     <script src="./js/config.js"></script>
+    <script src="./js/ui.js"></script>
     <script src="./js/nav.js"></script>
     <script src="./js/obtenerQuinielasTabla.js"></script>
     <script>
